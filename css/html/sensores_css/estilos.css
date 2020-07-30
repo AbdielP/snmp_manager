@@ -1,0 +1,22 @@
+#sensores {
+    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+  }
+  
+  #sensores td, #sensores th {
+    border: 1px solid #ddd;
+    padding: 8px;
+  }
+  
+  #sensores tr:nth-child(even){background-color: #f2f2f2;}
+  
+  #sensores tr:hover {background-color: #ddd;}
+  
+  #sensores th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: left;
+    background-color: #2B343B;
+    color: white;
+  }

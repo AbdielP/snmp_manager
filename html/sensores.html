@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../css/html/config_css/main.css">
+    <link rel="stylesheet" href="../css/html/sensores_css/estilos.css">
+    <title>Sensores</title>
+</head>
+<body>
+    <header>
+        <h3>Administrar sensores</h3>
+    </header>
+    <main>
+        <div class="container-agregar-sensor">
+            <form id="form-add-sensor">
+                <input type="text" name="sensor" placeholder="Agregar sensor" required>
+                <select name="ubicacion" required>
+                    <option selected disabled></option>
+                    <option value="PA">PA</option>
+                    <option value="PB">PB</option>
+                </select>
+                <button id="btn-add-sensor" type="submit">Agregar sensor</button>
+            </form>
+        </div>
+        <div class="div-tabla">
+            <table id="sensores">
+                <tr>
+                  <th>IP Sensor</th>
+                  <th>Ubicación</th>
+                  <th>Eliminar</th>
+                </tr>
+                <div class="contenedor-sensores"></div>
+                <!-- <tr>
+                  <td><a href="http://172.18.227.69/">172.18.227.69</a></td>
+                  <td>PA</td>
+                  <td><button onclick="getSensorIp('172.18.227.69')">Eliminar x</button></td>
+                </tr>
+                <tr>
+                    <td><a href="http://172.18.227.69/">172.18.227.96</a></td>
+                    <td>PB</td>
+                    <td><button onclick="getSensorIp('172.18.227.96')">Eliminar x</button></td>
+                  </tr> -->
+              </table>
+        </div>
+    </main>
+    <script src="../javascript/sens-obf.js"></script>
+</body>
+</html>
