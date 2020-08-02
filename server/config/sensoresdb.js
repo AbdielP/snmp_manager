@@ -31,6 +31,7 @@ function dbSensores(){
         {planta:'PA',ip:'172.18.229.114'},{planta:'PA',ip:'172.18.229.115'},{planta:'PA',ip:'172.18.229.116'},{planta:'PA',ip:'172.18.229.117'},{planta:'PA',ip:'172.18.229.123'},{planta:'PA',ip:'172.18.229.124'},{planta:'PA',ip:'172.18.229.125'},{planta:'PA',ip:'172.18.229.126'},{planta:'PA',ip:'172.18.229.127'},
         {planta:'PB',ip:'172.18.229.110'},{planta:'PB',ip:'172.18.229.111'},{planta:'PB',ip:'172.18.229.112'},{planta:'PB',ip:'172.18.229.113'},{planta:'PB',ip:'172.18.229.118'},{planta:'PB',ip:'172.18.229.119'},{planta:'PB',ip:'172.18.229.120'},{planta:'PB',ip:'172.18.229.121'},{planta:'PB',ip:'172.18.229.122'},)
         // {planta:'PA',ip:'172.18.229.115'},{planta:'PA',ip:'172.18.229.125'})
+        // {planta:'PA',ip:'172.18.229.114'},{planta:'PA',ip:'172.18.229.115'},{planta:'PA',ip:'172.18.229.116'},{planta:'PA',ip:'172.18.229.117'},{planta:'PA',ip:'172.18.229.123'})
 
         var jsonbal = JSON.stringify(objbal);
 

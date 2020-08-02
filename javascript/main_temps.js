@@ -38,7 +38,7 @@
             // console.log(response)
             if(response){
                 App.utils.dibujarSensor(response.obj.sensores);
-                App.scanSensores(response.obj.sensores,idc);
+                App.scanSensores(response.obj.sensores,idc,archivo);
                 App.removerAnimacionConectando();
             }else{
                 App.removerAnimacionConectando();
@@ -50,19 +50,19 @@
         readData();
     },
     //GET sensores data
-    scanSensores:function(sensores,idc){
+    scanSensores:function(sensores,idc,archivo){
         sensores.forEach(sensor=>{
             // console.log(sensor.ip)
             async function getData(){
                 const response = await App.utils.makeRequest({
                     url: App.config.api.getTemp(sensor.ip)
-                })
+                },idc,archivo)
                 if(response){
                     App.utils.actualizarSensor(response,idc);
                     window.setTimeout(getData, 20000);
                 }else{
                     App.animacionReconectando();
-                    windows.setTimeout(getData,10000);
+                    window.setTimeout(function(){ getData()},10000)
                 }
             }
             getData();
@@ -113,8 +113,6 @@
             boton.classList.add('sensor-low-critical');
         }else{
             App.removerClases(contenedor,boton);
-            // Hacer un estilo para los sensores sin valores en la TEMP
-            // console.log('sensor sin estado de temp')
         }
     },
     setColoresHum:function(valores,contenedor,boton){
@@ -144,8 +142,6 @@
         }
         else{
             App.removerClases(contenedor,boton);
-            // Hacer un estilo para los sensores sin valores en la HUM
-            // console.log('sensor sin estado de humedad')
         }
     },
     removerClases:function(contenedor,boton){
@@ -162,7 +158,7 @@
         boton.classList.remove('sensor-low-critical');
     },
     utils: {
-        makeRequest: async function({method = "get", url, body = null}){
+        makeRequest: async function({method = "get", url, body = null},idc,archivo){
             try {
                 const response = await fetch(url, {
                     method,
@@ -170,10 +166,9 @@
                 });
                 App.removerAnimacionReconectando();
                 return response.json();
-            } catch (error) {
-                window.setTimeout(function(){App.utils.makeRequest({method:"get", url, body:null})}, 5000);
-                // console.log(error)
-                
+            } catch (error) {   
+                //este try ctch no hace nada realmente
+                console.log(error)        
             }
         },
         dibujarSensor: function(sensores){
