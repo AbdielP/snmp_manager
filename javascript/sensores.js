@@ -9,6 +9,9 @@
                 },
                 addSensor: function(){
                     return `${App.config.api.baseUrl}/agregar/sensor`;
+                },
+                removeSensor: function(archivo,ip){
+                    return `${App.config.api.baseUrl}/remover/sensor/${archivo}/${ip}`;
                 }
             }
         },
@@ -50,27 +53,30 @@
                     body:form
                 })
                 console.log(response)
+                // App.dibujarTabla(response.str_sensores)
+
                 // App.dibujarTabla(response.obj.sensores)
                 // App.readSensoresFile(App.getParams(queryString)); 
             }
             sendIpSensor();
         },
-        deleteSensor:function(){
+        borrarSensor:function(ip){
+            var archivo = App.getParams()
             async function sendIP(){
-                const response = await App.utils.postSensor({
-                    // url: App.config.addSensor()
+                const response = await App.utils.deleteSensor({
+                    url: App.config.api.removeSensor(archivo,ip)
                 })
                 console.log(response)
             }
             sendIP();
-            // console.log(`Iniciando función de borrado para ${ip}`)
+            console.log(`Iniciando función de borrado para ${ip}`)
         },
         getSensorIp:function(ip){
             var confirmar = confirm(`Confirmar que desea eliminar el sensor ${ip}`)
             if(!confirmar){
                 return false;
             }else{
-                App.deleteSensor(ip);
+                App.borrarSensor(ip);
             }
         },
         utils:{
@@ -85,6 +91,16 @@
                 const response = await fetch(url, {
                     method,
                     body: JSON.stringify(body),
+                    headers:{
+                        'Content-Type': 'application/json'
+                    }
+                })
+                return response.json();
+            },
+            deleteSensor: async function({method = "delete",url, body=null}){
+                const response = await fetch(url,{
+                    method,
+                    body: body ? JSON.stringify(body) : null,
                     headers:{
                         'Content-Type': 'application/json'
                     }
