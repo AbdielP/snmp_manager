@@ -52,11 +52,7 @@
                     url: App.config.api.addSensor(),
                     body:form
                 })
-                console.log(response)
-                // App.dibujarTabla(response.str_sensores)
-
-                // App.dibujarTabla(response.obj.sensores)
-                // App.readSensoresFile(App.getParams(queryString)); 
+                App.dibujarTabla(response.sensores.sensores) 
             }
             sendIpSensor();
         },
@@ -66,10 +62,9 @@
                 const response = await App.utils.deleteSensor({
                     url: App.config.api.removeSensor(archivo,ip)
                 })
-                console.log(response)
+                App.dibujarTabla(response.obj.sensores)
             }
             sendIP();
-            console.log(`Iniciando función de borrado para ${ip}`)
         },
         getSensorIp:function(ip){
             var confirmar = confirm(`Confirmar que desea eliminar el sensor ${ip}`)
