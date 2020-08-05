@@ -52,7 +52,8 @@
                     url: App.config.api.addSensor(),
                     body:form
                 })
-                App.dibujarTabla(response.sensores.sensores) 
+                if(response.ok) App.dibujarTabla(response.sensores.sensores) 
+                alert(response.message)
             }
             sendIpSensor();
         },

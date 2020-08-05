@@ -4,23 +4,43 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css?family=Crimson+Text|Muli&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/sidebar_V01.css">
+    <link rel="stylesheet" href="../css/main_V01.css">
     <link rel="stylesheet" href="../css/html/config_css/main.css">
     <title>Configuración</title>
 </head>
 <body>
-    <h4>Menú de opciones</h4>
-
-    <ul>
-        <li>Gestionar sensores de temperatura y humedad
-            <ul>
-                <li><a href="sensores.html?file=sensorespp">IDC Panamá Pacífico</a></li>
-                <li><a href="sensores.html?file=sensoresbal">IDC Balboa</a></li>
-            </ul>
-        </li>
-    </ul>
-
-</body>
-</html>
-    <a href="../index.html">Volver</a>
+    <div class="contenedor">
+        <nav class="sidebar">
+            <dvi class="sidebar-logo">
+                <img src="../assets/img/liberty_logo.png" alt="" width="38">
+            </dvi>
+            <div class="sidebar-contenido">
+                <!-- <button type="button" class="menu-item" id="btn-temperaturas"><img src="../assets/img/TEMP.png" alt="" width="20"> Temperaturas</button> -->
+                <a class="menu-item-a" href="../index.html"><i class="fas fa-cogs"></i> Home</a>
+            </div>
+            <div class="sidebar-contenido">
+                <a class="menu-item-a" href="config.html"><i class="fas fa-cogs"></i> Configuración</a>
+            </div>
+        </nav>
+        
+        <main class="contenido">
+            <div class="contenido-label">
+                <h4>Menú de opciones</h4>
+            </div>
+            <div class="contenedor-contenido">
+                <ul>
+                    <li>Gestionar sensores de temperatura y humedad
+                        <ul>
+                            <li><a href="sensores.html?file=sensorespp">IDC Panamá Pacífico</a></li>
+                            <li><a href="sensores.html?file=sensoresbal">IDC Balboa</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </main>
+    </div>
+    <!-- <a href="../index.html">Volver</a> -->
+    <script src="https://kit.fontawesome.com/5b3c4dd78b.js" crossorigin="anonymous"></script>
 </body>
 </html>
