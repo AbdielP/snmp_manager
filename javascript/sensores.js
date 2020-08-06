@@ -109,9 +109,9 @@
             var arrayIps = [];
             ipsensores.forEach(sensor => {
                 domTabla += `<tr>
-                                <td><a href="http://${sensor.ip}/">${sensor.ip}</a></td>
+                                <td><a class="link-sensores" href="http://${sensor.ip}/" target="_blank">${sensor.ip}</a></td>
                                 <td>${sensor.planta}</td>
-                                <td><button id="btn-eliminar-${sensor.ip}">Eliminar x</button></td>
+                                <td><button class="btn-eliminar-sensor" id="btn-eliminar-${sensor.ip}">Eliminar x</button></td>
                             </tr>`
                 App.htmlElements.tablaSensores.innerHTML = domTabla;
                 arrayIps.push(sensor.ip)
