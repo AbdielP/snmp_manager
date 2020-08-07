@@ -1,0 +1,16 @@
+version: "3.8"
+services:
+    php:
+        build:
+            context: ./
+            dockerfile: dockerfile
+        container_name: php-server
+        restart: always
+        ports:
+            - 8080:80
+        volumes: 
+            - ./:/var/www/html
+            - ./config:/usr/local/etc/php
+volumes:
+    html: {}
+    config: {}
