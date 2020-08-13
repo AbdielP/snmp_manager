@@ -1,4 +1,4 @@
-#### PORTAL DE MONITOREO SNMP #######
+# PORTAL DE MONITOREO SNMP
 
 ### Features
 
@@ -16,3 +16,32 @@
     - Alerta visual cuando el sensor se cuelga o pierde conexión o sufre algún daño.
   - Alerta visual de reconexión mientras reconecta con el servidor SNMP.
   - Prevención de direcciones IP duplicadas.
+______________________
+
+### El código Javascript utiliza el siguiente formato de plantilla/estructura de diseño 
+
+```javascript
+(function(){
+    var App = {
+        config:{
+            api:{}
+        },
+        htmlElements:{},
+        init: function(){},
+        events:{},
+        utils:{}
+    }
+    App.init();
+})();
+```
+_________
+
+Capturas de pantalla:
+-------------
+### Dashboard principal.
+Vista "sensores" para monitoreo de temperatura y humedad.
+<img src="assets/Img_readme/dashboard.png" alt="" width="100%">
+### Característica responsive.
+Propiedad responsive para adaptarse a todo tipo de pantallas y dispositivos.
+<img src="assets/Img_readme/dashboard_responsive2.png" alt="" width="49%">
+<img src="assets/Img_readme/dashboard_responsive1.png" alt="" width="49%"> 
