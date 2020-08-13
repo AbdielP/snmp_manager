@@ -39,9 +39,15 @@ _________
 Capturas de pantalla:
 -------------
 ### Dashboard principal.
-Vista "sensores" para monitoreo de temperatura y humedad.
+Vista "Temperaturas" para monitoreo de temperatura y humedad.
 <img src="assets/Img_readme/dashboard.png" alt="" width="100%">
-### Característica responsive.
+### Propiedades responsive.
 Propiedad responsive para adaptarse a todo tipo de pantallas y dispositivos.
 <img src="assets/Img_readme/dashboard_responsive2.png" alt="" width="49%">
 <img src="assets/Img_readme/dashboard_responsive1.png" alt="" width="49%"> 
+### Base de datos de sensores
+Listado de direcciones IP de dispositivos de red para administración/monitoreo SNMP.
+<img src="assets/Img_readme/sensor_list.png" alt="" width="100%">
+### Reconexión automática
+La aplicación tiene la capacidad de reconectar automaticamente con el servidor SNMP
+<img src="assets/Img_readme/reconecting.png" alt="" width="100%">
