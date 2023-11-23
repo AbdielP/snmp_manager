@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css?family=Crimson+Text|Muli&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/main_V01.css"> 
+    <link rel="stylesheet" href="css/header_V01.css">
+    <link rel="stylesheet" href="css/contenido_V01.css">
+    <link rel="stylesheet" href="css/sensores_V01.css">
+    <link rel="stylesheet" href="css/sidebar_V01.css">
+    <title>T&H IDC</title>
+</head>
+<body>
+    <div class="contenedor">
+        <header class="header">
+            <div class="header-titulo">
+                <h3>Temperaturas IDC</h3>
+            </div>
+            <div class="header-datacenter"><!-- NOMBRE DEL IDC CLIECKEADO --></div>
+            <!-- <div class="header-fecha">
+                <h3 id="fecha">-</h3>
+            </div> -->
+        </header>
+
+        <nav class="sidebar">
+            <dvi class="sidebar-logo">
+                <!-- <i class="fas fa-leaf"></i> -->
+                <img src="./assets/img/liberty_logo.png" alt="" width="38">
+            </dvi>
+            <div class="sidebar-contenido">
+                <button type="button" class="menu-item" id="btn-temperaturas"><img src="./assets/img/TEMP.png" alt="" width="20"> Temperaturas</button>
+            </div>
+            <div class="sidebar-contenido">
+                <a class="menu-item-a" href="./html/config.html"><i class="fas fa-cogs"></i> Configuración</a>
+            </div>
+        </nav>
+
+        <main class="contenido">
+            <div class="contenido-opciones">
+                <div class="opciones-datacenter">
+                    <button type="button" id="btn-idc-pp">
+                        <!-- <i class="fas fa-building"></i> -->
+                        <img src="./assets/img/IDCBAL.png" alt="" width="32">
+                        <h4>IDC Panamá Pacífico</h4>
+                    </button>
+                </div>
+                <div class="opciones-datacenter">
+                    <button type="button" id="btn-idc-bal">
+                        <!-- <i class="fas fa-building"></i> -->
+                        <img src="./assets/img/IDCBAL.png" alt="" width="32">
+                        <h4>IDC Balboa</h4>
+                    </button>
+                </div>
+            </div>
+
+            <div class="contenido-principal">
+                <div class="contenedor-planta" id="contenedor-planta">
+                    <div class="planta-titulo">
+                        <h2>Planta Alta</h2>
+                    </div>
+                    
+                    <div class="contenedor-loading">
+                        <div class="loader"></div> 
+                        <h4>Cargando</h4>
+                    </div>
+                    <!-- CONTENEDOR DE SENSORES!!!!! -->
+                    <div class="main-contenedor-sensor" id="main-contenedor-sensor">
+                    
+                    </div>
+                </div>
+
+                <div class="contenedor-planta" id="contenedor-planta-baja">
+                    <div class="planta-titulo">
+                        <h2>Planta Baja</h2>
+                    </div>
+                    <div class="contenedor-loading">
+                        <div class="loader"></div> 
+                        <h4>Cargando</h4>
+                    </div>
+                    <!-- CONTENEDOR DE SENSORES!!!!! -->
+                    <div class="main-contenedor-sensor" id="main-contenedor-sensor-pb"></div>
+                </div>
+
+            </div>
+        </main>
+
+        <!-- <footer class="footer">
+            Footer - año - bla bla
+        </footer> -->
+    </div>
+
+    <div class="contenedor-reconectando">
+        <div class="contenedor-loading-reconectando">
+            <div class="loader-reconnect"></div> 
+            <h2>Reconectando...</h2>
+        </div>
+    </div>
+
+    <script src="https://kit.fontawesome.com/5b3c4dd78b.js" crossorigin="anonymous"></script>
+    <script src="./javascript/main_temps.js"></script>
+    <!-- <script src="./javascript/main-obf.js"></script> -->
+</body>
+</html>

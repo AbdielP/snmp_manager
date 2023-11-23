@@ -1,0 +1,118 @@
+header, .main-sensores {
+  min-width: 375px;
+}
+
+header{
+  margin: 15px 15px 0 15px;
+  padding: 5px;
+  background-color: #2B343B;
+}
+
+#form-add-sensor{
+  display: flex;
+  margin: 0 15px;
+  background-color: #0A70CF;
+}
+
+.contenedor-nuevo-sensor{
+  display: flex;
+  flex-direction: column;
+  width: 150px;
+}.contenedor-volver{
+  margin: 15px;
+}.contenedor-volver a{
+  color: #e9ecf4;
+  text-align: center;
+  font-size: .85rem;
+}
+
+label{
+  font-size: .8rem;
+  margin: 2px;
+}
+
+.select-sensor {
+  color: #e9ecf4;
+  border: none;
+  padding: 5px;
+  margin: 3px;
+  background: #2B343B;
+  width: 65px;
+  padding: 4px;
+}
+
+.input_add_sensor, #btn-add-sensor,
+.select-sensor {
+  color: #e9ecf4;
+  border: none;
+  padding: 5px;
+  margin: 3px;
+  background: #2B343B;
+}.select-sensor{
+  width: 55px;
+  padding: 4px;
+}#btn-add-sensor{
+  cursor: pointer;
+  background-color: #5BC364;
+  border-radius: 3px;
+}#btn-add-sensor:hover{
+  background-color: #3C9243;
+}
+
+.contenedor-ubicacion-sensor{
+  width: 250px;
+}
+
+.div-tabla{
+  margin: 5px 30px;
+}
+
+#sensores {
+  font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+  
+#sensores td, #sensores th {
+  padding: 8px;
+}
+  
+#sensores tr:nth-child(even){background-color: #2B343B;}
+  
+#sensores tr:hover {background-color: #0A70CF;}
+  
+#sensores th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: #2B343B;
+  color: #e9ecf4;
+}
+
+.link-sensores{
+  font-size: .8rem;
+  color: #e9ecf4;
+  text-decoration: none;
+}.link-sensores:visited{
+  color: #e9ecf4;
+}
+
+.btn-eliminar-sensor{
+  cursor: pointer;
+  color:#B61E17;
+  border:none;
+  background: none;
+  padding: 3px;
+}.btn-eliminar-sensor:hover{
+  color: #6E120E;
+}
+
+@media (min-width: 470px) {
+  .select-sensor {
+    width: 85px;
+  }
+
+  .contenedor-ubicacion-sensor{
+    width: 200px;
+  }
+}
