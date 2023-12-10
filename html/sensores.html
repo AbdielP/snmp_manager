@@ -18,17 +18,17 @@
             <form id="form-add-sensor">
                 <div class="contenedor-nuevo-sensor">
                     <!-- <label for="sensor">Añadir nuevo sensor (IP)</label> -->
-                    <input class="input_add_sensor" type="text" id="sensor" name="sensor" placeholder="172.18.X.X" required>
+                    <input class="input_add_sensor" type="text" name="sensor" id="sensor" placeholder="172.18.X.X" required>
                 </div>
                 <div class="contenedor-ubicacion-sensor">
                     <!-- <label for="ubicacion">Ubicación del sensor</label> -->
                     <select class="select-sensor" name="ubicacion" id="ubicacion" required>
-                        <option selected disabled>Ubicación</option>
+                        <option selected disabled value="">Ubicación</option>
                         <option value="PA">PA</option>
                         <option value="PB">PB</option>
                     </select>
                     <select class="select-sensor" name="modelo" id="modelo" required>
-                        <option selected disabled>Modelo</option>
+                        <option selected disabled value="">Modelo</option>
                         <option value="sp2">SP2</option>
                         <option value="sp2+">SP2+</option>
                     </select>
@@ -49,8 +49,7 @@
             </table>
         </div>
     </main>
-    <!-- <script src="../javascript/sensores.js"></script> -->
     <script src="../javascript/test.js"></script>
-    <!-- <script src="../javascript/sens-obf.js"></script> -->
+    <!-- <script src="../javascript/wtf.js"></script> -->
 </body>
 </html>
