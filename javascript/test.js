@@ -27,20 +27,10 @@
         events: {
             addEventNewSensor: (event) => {
                 event.preventDefault()
-                // const form = {
-                //     ip: App.htmlElements.formSensores.sensor.value,
-                //     planta: App.htmlElements.formSensores.ubicacion.value,
-                //     modelo: App.htmlElements.formSensores.modelo.value,
-                //     archivo: App.variables.sensoresFile
-                // }
-                const form = new FormData(App.htmlElements.formSensores)
-                // ESTA MIERDA SIGUE RECARGANDO LA PAGINA...
-                // App.utils.postSensor({
-                //     url: `${App.variables.serverUrl}/agregar/sensor`,
-                //     body: form
-                // })
-                // console.log(form)
-                App.utils.postSensor(form)
+                const form = App.htmlElements.formSensores
+                const formData = new FormData(form)
+                const formPayload = new URLSearchParams(formData)
+                App.utils.postSensor(formPayload)
             }
         },
         utils: {
@@ -69,19 +59,14 @@
                 // App.events.addEventBorrar(arrayIps)
             },
             postSensor: async (form) => {
-                console.log(form.get('sensor'))
+                // console.log(form.get('sensor'))
                 const newsensor = await fetch(`${App.variables.serverUrl}/agregar/sensor`, {
                     method: "POST",
-                    header: {
-                        "Content-type": "application/json; charset=UTF-8"
-                    },
                     body: form
                 })
-                return console.log(newsensor)
                 const response = await newsensor.json();
                 // if(response.ok) App.utils.sensoresDOM(response.sensores.sensores) 
                 if(response.ok) console.log(response)
-                alert(response.message)
             }
         }
     }
