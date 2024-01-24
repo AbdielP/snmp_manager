@@ -16,6 +16,7 @@
         },
         bindEvents: () => {
             App.htmlElements.formSensores.addEventListener('submit', App.events.addEventNewSensor)
+            
         },
         initializeData: {
             getUrlSearchParams: () => {
@@ -27,10 +28,19 @@
         events: {
             addEventNewSensor: (event) => {
                 event.preventDefault()
+                // return console.log('wtf!....')
                 const form = App.htmlElements.formSensores
                 const formData = new FormData(form)
+                formData.append("archivo", App.variables.sensoresFile)
                 const formPayload = new URLSearchParams(formData)
+                // console.log(formPayload)
                 App.utils.postSensor(formPayload)
+            },
+            AddEventBorrar: (arrayIps) => {
+                arrayIps.map(ip => {
+                    const btnEliminar = document.getElementById(`btn-eliminar-${ip}`);
+                    btnEliminar.addEventListener("click", () => App.utils.borrarSensor(ip));
+                })
             }
         },
         utils: {
@@ -51,22 +61,40 @@
                     dom += `<tr>
                                 <td><a class="link-sensores" href="http://${sensor.ip}/" target="_blank">${sensor.ip}</a></td>
                                 <td>${sensor.planta}</td>
+                                <td>${sensor.modelo}</td>
                                 <td><button type="submit" class="btn-eliminar-sensor" id="btn-eliminar-${sensor.ip}">Eliminar x</button></td>
                             </tr>`
                     arrayIps.push(sensor.ip)
                 })
                 App.htmlElements.tableSensores.innerHTML += dom
-                // App.events.addEventBorrar(arrayIps)
+                App.events.AddEventBorrar(arrayIps)
+
             },
             postSensor: async (form) => {
-                // console.log(form.get('sensor'))
+                // return console.log(form)
                 const newsensor = await fetch(`${App.variables.serverUrl}/agregar/sensor`, {
                     method: "POST",
                     body: form
                 })
                 const response = await newsensor.json();
-                // if(response.ok) App.utils.sensoresDOM(response.sensores.sensores) 
-                if(response.ok) console.log(response)
+                if(response.ok) App.utils.sensoresDOM(response.sensores.sensores) 
+                // if(response.ok) console.log(response)
+            },
+            borrarSensor: async (ip) => {
+                const confirmar = confirm(`Confirmar que desea eliminar el sensor ${ip}`)
+                if (!confirmar) { return false }
+                else {
+                    // console.log(ip)
+                    const archivo = App.variables.sensoresFile
+                    const response = await fetch(`${App.variables.serverUrl}/remover/sensor/${archivo}/${ip}`,{
+                        method: "delete",
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    return console.log(response.json())
+                    // App.dibujarTabla(response.obj.sensores)
+                }
             }
         }
     }
