@@ -76,9 +76,7 @@
                     method: "POST",
                     body: form
                 })
-                const response = await newsensor.json();
-                if(response.ok) App.utils.sensoresDOM(response.sensores.sensores) 
-                // if(response.ok) console.log(response)
+                // if(response.ok) App.utils.sensoresDOM(response.sensores.sensores) 
             },
             borrarSensor: async (ip) => {
                 const confirmar = confirm(`Confirmar que desea eliminar el sensor ${ip}`)
@@ -92,7 +90,6 @@
                             'Content-Type': 'application/json'
                         }
                     })
-                    return console.log(response.json())
                     // App.dibujarTabla(response.obj.sensores)
                 }
             }
