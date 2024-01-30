@@ -107,6 +107,12 @@ label{
   color: #6E120E;
 }
 
+.error {
+  border: 1px solid #B61E17;
+  /* padding: 5em; */
+  /* border-color: red; */
+}
+
 @media (min-width: 470px) {
   .select-sensor {
     width: 85px;
