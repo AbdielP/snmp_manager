@@ -52,11 +52,16 @@ label{
   width: 55px;
   padding: 4px;
 }#btn-add-sensor{
+  padding: 0 1rem;
   cursor: pointer;
   background-color: #5BC364;
   border-radius: 3px;
 }#btn-add-sensor:hover{
   background-color: #3C9243;
+}#btn-add-sensor:disabled {
+  background-color:rgba(92, 194, 100, .4);
+
+  cursor: default;
 }
 
 .contenedor-ubicacion-sensor{
@@ -108,9 +113,8 @@ label{
 }
 
 .error {
-  border: 1px solid #B61E17;
-  /* padding: 5em; */
-  /* border-color: red; */
+  outline: 1px solid #B61E17;
+  outline-offset: -1px;
 }
 
 @media (min-width: 470px) {
