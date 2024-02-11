@@ -7,8 +7,13 @@
             readFile: function(archivo){
                 return `${App.config.api.baseUrl}/read/${archivo}`;
             },
-            getTemp: function(ip) {
-                return `${App.config.api.baseUrl}/temp/${ip}`;
+            getTemp: function(ip, modelo) {
+                // console.log(modelo)
+                if(modelo == 'SP2') {
+                    return `${App.config.api.baseUrl}/temp/sp2/${ip}`
+                } else {
+                    return `${App.config.api.baseUrl}/temp/sp2plus/${ip}`
+                }
             }
         }
     },
@@ -55,7 +60,7 @@
             // console.log(sensor.ip)
             async function getData(){
                 const response = await App.utils.makeRequest({
-                    url: App.config.api.getTemp(sensor.ip)
+                    url: App.config.api.getTemp(sensor.ip, sensor.modelo)
                 },idc,archivo)
                 if(response){
                     App.utils.actualizarSensor(response,idc);
