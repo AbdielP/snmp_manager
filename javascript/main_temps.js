@@ -253,8 +253,7 @@
             var objectValues = Object.values(sensores)
             response_array.push(objectValues)
             response_array.forEach(sensor=>{
-                console.log(sensor)
-                // console.log(sensor[2])
+                // console.log(sensor)
                 var contenedorTempIcono = document.getElementById(`div-sensor-temp-icon-${sensor[1]}`);
                 var contenedorHumIcon = document.getElementById(`div-sensor-hum-icon-${sensor[1]}`);
                 var btnTemp = document.getElementById(`btn-temp-${sensor[1]}`);
@@ -265,23 +264,27 @@
                 var h3Temperatura = document.getElementById(`h2-temp-${sensor[1]}`);
                 var h3Humedad = document.getElementById(`h2-hum-${sensor[1]}`);
 
-                App.setColoresTemp(sensor[0][2],contenedorTempIcono,btnTemp);
-                App.setColoresHum(sensor[0][4],contenedorHumIcon,btnHum);
-                // [0][3] son los sensores SP2+
+                if(sensores.modelo == 'SP2+') {
+                    App.setColoresTemp(sensor[0][2]/10,contenedorTempIcono,btnTemp);
+                    App.setColoresHum(sensor[0][3],contenedorHumIcon,btnHum);
+                } else {
+                    App.setColoresTemp(sensor[0][2],contenedorTempIcono,btnTemp);
+                    App.setColoresHum(sensor[0][4],contenedorHumIcon,btnHum);
+                }
                
                 tituloSensor.innerHTML = `<a class="link-titulo-sensor" href="http://${sensor[1]}/" target="_blank">${sensor[0][0]}</a>`;
-                h3Temperatura.innerHTML = `${sensor[0][2]}F°`;
-                h3Humedad.innerHTML = `${sensor[0][4]}%`;
+                if(sensores.modelo == 'SP2+') {
+                    h3Temperatura.innerHTML = `${sensor[0][2]/10}F°`;
+                    h3Humedad.innerHTML = `${sensor[0][3]}%`;
+                } else {
+                    h3Temperatura.innerHTML = `${sensor[0][2]}F°`;
+                    h3Humedad.innerHTML = `${sensor[0][4]}%`;
+                }
                 cuerpoSensor.classList.remove('opacidad');
                 if(sensor[2] != ""){
-                    // sensor[2].name = 'RequestTimedOutError'
-                    // sensor[2].name = 'RequesFailedError'
-                    // var reTituloSensor = document.getElementById(`h3-${sensor[1]}`);
-                    // console.log(reTituloSensor,sensor[1])
                     cuerpoSensor.classList.add('opacidad');
                     h3Temperatura.innerHTML = '<i class="fas fa-exclamation-circle warning-color"></i>';
                     h3Humedad.innerHTML = '<i class="fas fa-exclamation-circle warning-color"></i>';
-                    // tituloSensor.classList.add('warning-color');
                     tituloSensor.innerHTML = `<a class="warning-color" href="http://${sensor[1]}/" target="_blank">${sensor[1]}</a>`;
                 } 
             })
