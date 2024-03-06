@@ -65,6 +65,7 @@
                 if(response){
                     App.utils.actualizarSensor(response,idc);
                     window.setTimeout(getData, 20000);
+                    // window.setTimeout(getData, 1500);
                 }else{
                     App.animacionReconectando();
                     window.setTimeout(function(){ getData()},10000)
@@ -92,7 +93,8 @@
         App.htmlElements.contenedor_reconnect.style.display = "none";
         App.htmlElements.contenedor.style.opacity = 1;
     },
-    setColoresTemp: function(valores,contenedor,boton){
+    setColoresTemp: function(valores,contenedor,boton) {
+        // !!!! PROBLEMA AQUÍ:
         App.removerClases(contenedor,boton);
         if(valores >= 87){
             contenedor.classList.add('sensor-high-critical');
@@ -117,6 +119,7 @@
             contenedor.classList.add('sensor-low-critical');
             boton.classList.add('sensor-low-critical');
         }else{
+            console.log('MAL!?')
             App.removerClases(contenedor,boton);
         }
     },
@@ -265,7 +268,8 @@
                 var h3Humedad = document.getElementById(`h2-hum-${sensor[1]}`);
 
                 if(sensores.modelo == 'SP2+') {
-                    App.setColoresTemp(sensor[0][2]/10,contenedorTempIcono,btnTemp);
+                    // console.log(sensor[0][2])
+                    App.setColoresTemp(Number(sensor[0][2]/10),contenedorTempIcono,btnTemp);
                     App.setColoresHum(sensor[0][3],contenedorHumIcon,btnHum);
                 } else {
                     App.setColoresTemp(sensor[0][2],contenedorTempIcono,btnTemp);
