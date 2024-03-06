@@ -65,7 +65,6 @@
                 if(response){
                     App.utils.actualizarSensor(response,idc);
                     window.setTimeout(getData, 20000);
-                    // window.setTimeout(getData, 1500);
                 }else{
                     App.animacionReconectando();
                     window.setTimeout(function(){ getData()},10000)
