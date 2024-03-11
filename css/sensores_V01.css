@@ -29,6 +29,7 @@
     display: flex;
     width: 100%;
     height: 100%;
+    /* margin: 0 .3em; */
     /* opacity: .1; */
     /* background-color: green; */
 }
@@ -67,7 +68,7 @@
     margin-left: -50px;
     /* top: 70%; */
     margin-top: -10px;
-    border-radius: 8px;
+    /* border-radius: 8px; */
     color: #e9ecf4;
 }
 .contenedor-sensor-temp .div-sensor-temp-temperatura,
@@ -75,7 +76,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.7rem;
+    font-size: 1.5rem;
     width: 100%;
     height: 50%;
     background-color: #e9ecf4;
@@ -159,5 +160,7 @@
     .contenedor-sensor-temp .div-sensor-temp-temperatura,
     .contenedor-sensor-hum .div-sensor-hum-porcentaje{
         font-size: 1rem;
+        /* font-size: .93rem; */
+        margin: 0 1.2em;
     }
 }
