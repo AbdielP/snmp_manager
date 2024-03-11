@@ -50,13 +50,8 @@
     font-size: 3rem;
     width: 100%;
     height: 50%;
-    /* background-color: #2984b3;
-    background-color: #5ac462;
-    background-color: #facc2e;
-    background-color: #f83c33;
-    border: 1px solid #941814; */
-    border: 1px solid #e9ecf4;
-    border-radius: 5px;
+    /* border-radius: 5px; */
+    /* border: 1px solid #e9ecf4; */
 }
 .contenedor-sensor-temp .div-sensor-temp-centro,
 .contenedor-sensor-hum .div-sensor-hum-centro{
@@ -84,9 +79,9 @@
     width: 100%;
     height: 50%;
     background-color: #e9ecf4;
-    border: 1px solid #a3a5ae;
     color: #2B343B;
-    border-radius: 5px;
+    /* border: 1px solid #a3a5ae; */
+    /* border-radius: 5px; */
 }
 
 .contenedor-sensores-cuerpo .contenedor-sensor-hum{
