@@ -2,8 +2,8 @@
     const App = {
         variables: {
             sensoresFile: '',
-            // serverUrl: 'http://172.18.227.128:3000'
-            serverUrl: 'http://localhost:3000'
+            serverUrl: 'http://172.18.227.178:3000'
+            // serverUrl: 'http://localhost:3000'
         },
         htmlElements: {
             formSensores: document.querySelector('#form-add-sensor'),

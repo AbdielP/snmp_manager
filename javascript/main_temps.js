@@ -94,6 +94,7 @@
     },
     setColoresTemp: function(valores,contenedor,boton) {
         // !!!! PROBLEMA AQUÍ:
+        // return console.log(valores)
         App.removerClases(contenedor,boton);
         if(valores >= 87){
             contenedor.classList.add('sensor-high-critical');
@@ -119,6 +120,7 @@
             boton.classList.add('sensor-low-critical');
         }else{
             console.log('MAL!?')
+            console.log(valores)
             App.removerClases(contenedor,boton);
         }
     },
@@ -265,6 +267,8 @@
                 var cuerpoSensor = document.getElementById(`sensores-cuerpo-${sensor[1]}`)
                 var h3Temperatura = document.getElementById(`h2-temp-${sensor[1]}`);
                 var h3Humedad = document.getElementById(`h2-hum-${sensor[1]}`);
+
+                // return console.log(sensores) //ERROR: Seguir desde aquí!
 
                 if(sensores.modelo == 'SP2+') {
                     // console.log(sensor[0][2])
