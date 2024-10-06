@@ -94,9 +94,6 @@
         },
         setColoresTemp: function (valores, contenedor, boton) {
             valores = parseInt(valores)
-            // valores = parseFloat(valores.toFixed(2)) 
-            // console.log("Valores redondeados:", valores) 
-
             App.removerClases(contenedor, boton)
             if (valores >= 87) {
                 contenedor.classList.add('sensor-high-critical')
