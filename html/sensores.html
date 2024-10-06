@@ -13,11 +13,16 @@
     <header>
         <h3>Listado de sensores</h3>
     </header>
+<<<<<<< HEAD
     <main>
+=======
+    <main class="main-sensores">
+>>>>>>> 8c7e3f5569398656830e7d4cbb3953133482e86c
         <div class="container-agregar-sensor">
             <form id="form-add-sensor">
                 <div class="contenedor-nuevo-sensor">
                     <!-- <label for="sensor">Añadir nuevo sensor (IP)</label> -->
+<<<<<<< HEAD
                     <input class="input_add_sensor" type="text" id="sensor" name="sensor" placeholder="172.18.X.X" required>
                 </div>
                 <div class="contenedor-ubicacion-sensor">
@@ -27,6 +32,22 @@
                         <option value="PA">PA</option>
                         <option value="PB">PB</option>
                     </select>
+=======
+                    <input class="input_add_sensor" type="text" name="ip" id="ip" placeholder="172.18.X.X" required>
+                </div>
+                <div class="contenedor-ubicacion-sensor">
+                    <!-- <label for="ubicacion">Ubicación del sensor</label> -->
+                    <select class="select-sensor" name="planta" id="planta" required>
+                        <option selected disabled value="">Ubicación</option>
+                        <option value="PA">PA</option>
+                        <option value="PB">PB</option>
+                    </select>
+                    <select class="select-sensor" name="modelo" id="modelo" required>
+                        <option selected disabled value="">Modelo</option>
+                        <option value="SP2">SP2</option>
+                        <option value="SP2+">SP2+</option>
+                    </select>
+>>>>>>> 8c7e3f5569398656830e7d4cbb3953133482e86c
                 </div>
                 <button id="btn-add-sensor" type="submit">Agregar sensor</button>
             </form>
@@ -39,12 +60,20 @@
                 <tr>
                   <th>IP Sensor</th>
                   <th>Ubicación</th>
+<<<<<<< HEAD
+=======
+                  <th>Modelo</th>
+>>>>>>> 8c7e3f5569398656830e7d4cbb3953133482e86c
                   <th>Eliminar</th>
                 </tr>
             </table>
         </div>
     </main>
     <script src="../javascript/sensores.js"></script>
+<<<<<<< HEAD
     <!-- <script src="../javascript/sens-obf.js"></script> -->
+=======
+    <script src="../javascript/ipaddressfilter.js"></script>
+>>>>>>> 8c7e3f5569398656830e7d4cbb3953133482e86c
 </body>
 </html>

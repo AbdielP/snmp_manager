@@ -2,13 +2,27 @@
  var App = {
     config: {
         api:{
+<<<<<<< HEAD
             baseUrl: "http://172.18.227.128:3000",
+=======
+            baseUrl: "http://172.18.227.178:3000",
+>>>>>>> 8c7e3f5569398656830e7d4cbb3953133482e86c
             // baseUrl: "http://localhost:3000",
             readFile: function(archivo){
                 return `${App.config.api.baseUrl}/read/${archivo}`;
             },
+<<<<<<< HEAD
             getTemp: function(ip) {
                 return `${App.config.api.baseUrl}/temp/${ip}`;
+=======
+            getTemp: function(ip, modelo) {
+                // console.log(modelo)
+                if(modelo == 'SP2') {
+                    return `${App.config.api.baseUrl}/temp/sp2/${ip}`
+                } else {
+                    return `${App.config.api.baseUrl}/temp/sp2plus/${ip}`
+                }
+>>>>>>> 8c7e3f5569398656830e7d4cbb3953133482e86c
             }
         }
     },
@@ -55,7 +69,11 @@
             // console.log(sensor.ip)
             async function getData(){
                 const response = await App.utils.makeRequest({
+<<<<<<< HEAD
                     url: App.config.api.getTemp(sensor.ip)
+=======
+                    url: App.config.api.getTemp(sensor.ip, sensor.modelo)
+>>>>>>> 8c7e3f5569398656830e7d4cbb3953133482e86c
                 },idc,archivo)
                 if(response){
                     App.utils.actualizarSensor(response,idc);
@@ -87,7 +105,13 @@
         App.htmlElements.contenedor_reconnect.style.display = "none";
         App.htmlElements.contenedor.style.opacity = 1;
     },
+<<<<<<< HEAD
     setColoresTemp: function(valores,contenedor,boton){
+=======
+    setColoresTemp: function(valores,contenedor,boton) {
+        // !!!! PROBLEMA AQUÍ:
+        // return console.log(valores)
+>>>>>>> 8c7e3f5569398656830e7d4cbb3953133482e86c
         App.removerClases(contenedor,boton);
         if(valores >= 87){
             contenedor.classList.add('sensor-high-critical');
@@ -112,6 +136,11 @@
             contenedor.classList.add('sensor-low-critical');
             boton.classList.add('sensor-low-critical');
         }else{
+<<<<<<< HEAD
+=======
+            console.log('MAL!?')
+            console.log(valores)
+>>>>>>> 8c7e3f5569398656830e7d4cbb3953133482e86c
             App.removerClases(contenedor,boton);
         }
     },
@@ -249,7 +278,10 @@
             response_array.push(objectValues)
             response_array.forEach(sensor=>{
                 // console.log(sensor)
+<<<<<<< HEAD
                 // console.log(sensor[2])
+=======
+>>>>>>> 8c7e3f5569398656830e7d4cbb3953133482e86c
                 var contenedorTempIcono = document.getElementById(`div-sensor-temp-icon-${sensor[1]}`);
                 var contenedorHumIcon = document.getElementById(`div-sensor-hum-icon-${sensor[1]}`);
                 var btnTemp = document.getElementById(`btn-temp-${sensor[1]}`);
@@ -260,6 +292,7 @@
                 var h3Temperatura = document.getElementById(`h2-temp-${sensor[1]}`);
                 var h3Humedad = document.getElementById(`h2-hum-${sensor[1]}`);
 
+<<<<<<< HEAD
                 App.setColoresTemp(sensor[0][2],contenedorTempIcono,btnTemp);
                 App.setColoresHum(sensor[0][4],contenedorHumIcon,btnHum);
                
@@ -276,6 +309,32 @@
                     h3Temperatura.innerHTML = '<i class="fas fa-exclamation-circle warning-color"></i>';
                     h3Humedad.innerHTML = '<i class="fas fa-exclamation-circle warning-color"></i>';
                     // tituloSensor.classList.add('warning-color');
+=======
+                // return console.log(sensores) //ERROR: Seguir desde aquí!
+
+                if(sensores.modelo == 'SP2+') {
+                    // console.log(sensor[0][2])
+                    App.setColoresTemp(Number(sensor[0][2]/10),contenedorTempIcono,btnTemp);
+                    App.setColoresHum(sensor[0][3],contenedorHumIcon,btnHum);
+                } else {
+                    App.setColoresTemp(sensor[0][2],contenedorTempIcono,btnTemp);
+                    App.setColoresHum(sensor[0][4],contenedorHumIcon,btnHum);
+                }
+               
+                tituloSensor.innerHTML = `<a class="link-titulo-sensor" href="http://${sensor[1]}/" target="_blank">${sensor[0][0]}</a>`;
+                if(sensores.modelo == 'SP2+') {
+                    h3Temperatura.innerHTML = `${sensor[0][2]/10}F°`;
+                    h3Humedad.innerHTML = `${sensor[0][3]}%`;
+                } else {
+                    h3Temperatura.innerHTML = `${sensor[0][2]}F°`;
+                    h3Humedad.innerHTML = `${sensor[0][4]}%`;
+                }
+                cuerpoSensor.classList.remove('opacidad');
+                if(sensor[2] != ""){
+                    cuerpoSensor.classList.add('opacidad');
+                    h3Temperatura.innerHTML = '<i class="fas fa-exclamation-circle warning-color"></i>';
+                    h3Humedad.innerHTML = '<i class="fas fa-exclamation-circle warning-color"></i>';
+>>>>>>> 8c7e3f5569398656830e7d4cbb3953133482e86c
                     tituloSensor.innerHTML = `<a class="warning-color" href="http://${sensor[1]}/" target="_blank">${sensor[1]}</a>`;
                 } 
             })

@@ -1,3 +1,10 @@
+<<<<<<< HEAD
+=======
+header, .main-sensores {
+  min-width: 375px;
+}
+
+>>>>>>> 8c7e3f5569398656830e7d4cbb3953133482e86c
 header{
   margin: 15px 15px 0 15px;
   padding: 5px;
@@ -27,25 +34,59 @@ label{
   margin: 2px;
 }
 
+<<<<<<< HEAD
 .input_add_sensor,#ubicacion,#btn-add-sensor{
+=======
+.select-sensor {
+>>>>>>> 8c7e3f5569398656830e7d4cbb3953133482e86c
   color: #e9ecf4;
   border: none;
   padding: 5px;
   margin: 3px;
   background: #2B343B;
+<<<<<<< HEAD
 }#ubicacion{
   width: 65px;
   padding: 4px;
 }#btn-add-sensor{
+=======
+  width: 65px;
+  padding: 4px;
+}
+
+.input_add_sensor, #btn-add-sensor,
+.select-sensor {
+  color: #e9ecf4;
+  border: none;
+  padding: 5px;
+  margin: 3px;
+  background: #2B343B;
+}.select-sensor{
+  width: 55px;
+  padding: 4px;
+}#btn-add-sensor{
+  padding: 0 1rem;
+>>>>>>> 8c7e3f5569398656830e7d4cbb3953133482e86c
   cursor: pointer;
   background-color: #5BC364;
   border-radius: 3px;
 }#btn-add-sensor:hover{
   background-color: #3C9243;
+<<<<<<< HEAD
 }
 
 .contenedor-ubicacion-sensor{
   width: 150px;
+=======
+}#btn-add-sensor:disabled {
+  background-color:rgba(92, 194, 100, .4);
+
+  cursor: default;
+}
+
+.contenedor-ubicacion-sensor{
+  width: 250px;
+>>>>>>> 8c7e3f5569398656830e7d4cbb3953133482e86c
 }
 
 .div-tabla{
@@ -90,4 +131,22 @@ label{
   padding: 3px;
 }.btn-eliminar-sensor:hover{
   color: #6E120E;
+<<<<<<< HEAD
+=======
+}
+
+.error {
+  outline: 1px solid #B61E17;
+  outline-offset: -1px;
+}
+
+@media (min-width: 470px) {
+  .select-sensor {
+    width: 85px;
+  }
+
+  .contenedor-ubicacion-sensor{
+    width: 200px;
+  }
+>>>>>>> 8c7e3f5569398656830e7d4cbb3953133482e86c
 }
