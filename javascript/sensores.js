@@ -2,8 +2,8 @@
     const App = {
         variables: {
             sensoresFile: '',
-            serverUrl: 'http://172.18.227.178:3000'
-            // serverUrl: 'http://localhost:3001'
+            servidorURL: "http://172.18.227.178:3000"
+            // servidorURL: 'http://localhost:3001'
         },
         htmlElements: {
             formSensores: document.querySelector('#form-add-sensor'),
@@ -45,7 +45,7 @@
         },
         utils: {
             getSensores: async () => {
-                const sensores = await fetch(`${App.variables.serverUrl}/read/${App.variables.sensoresFile}`, {
+                const sensores = await fetch(`${App.variables.servidorURL}/read/${App.variables.sensoresFile}`, {
                     method: 'GET',
                     headers: {
                         Accept: 'application/json',
@@ -72,7 +72,7 @@
             },
             postSensor: async (form) => {
                 // return console.log(form)
-                const response = await fetch(`${App.variables.serverUrl}/agregar/sensor`, {
+                const response = await fetch(`${App.variables.servidorURL}/agregar/sensor`, {
                     method: "POST",
                     body: form
                 })
@@ -91,7 +91,7 @@
                 else {
                     // console.log(ip)
                     const archivo = App.variables.sensoresFile
-                    const response = await fetch(`${App.variables.serverUrl}/remover/sensor/${archivo}/${ip}`,{
+                    const response = await fetch(`${App.variables.servidorURL}/remover/sensor/${archivo}/${ip}`,{
                         method: "delete",
                         headers: {
                             'Content-Type': 'application/json'
