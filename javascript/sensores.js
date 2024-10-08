@@ -62,11 +62,11 @@
                                 <td><a class="link-sensores" href="http://${sensor.ip}/" target="_blank">${sensor.ip}</a></td>
                                 <td>${sensor.planta}</td>
                                 <td>${sensor.modelo}</td>
-                                <td><button type="submit" class="btn-eliminar-sensor" id="btn-eliminar-${sensor.ip}">Eliminar x</button></td>
+                                <td><button type="button" class="btn-eliminar-sensor" id="btn-eliminar-${sensor.ip}">Eliminar x</button></td>
                             </tr>`
                     arrayIps.push(sensor.ip)
                 })
-                App.htmlElements.tableSensores.innerHTML += dom
+                App.htmlElements.tableSensores.innerHTML = dom
                 App.events.AddEventBorrar(arrayIps)
 
             },
@@ -78,7 +78,7 @@
                 })
                 if (response.ok) {
                     const result = await response.json()
-                    // return console.log(result)
+                    // console.log(result)
                     App.utils.sensoresDOM(result.sensores)
                 } else {
                     console.error("Error al agregar el sensor")
@@ -97,7 +97,14 @@
                             'Content-Type': 'application/json'
                         }
                     })
-                    // App.dibujarTabla(response.obj.sensores)
+                    if(response.ok) {
+                        const result = await response.json()
+                        // return console.log(result)
+                        App.utils.sensoresDOM(result.sensores)
+                    } else {
+                        console.error("Error al borrar el sensor")
+                    }
+                    
                 }
             }
         }
