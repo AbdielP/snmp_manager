@@ -9,11 +9,12 @@
                 },
                 getTemp: function (ip, modelo) {
                     // console.log(modelo)
-                    if (modelo == 'SP2') {
+                    if (modelo == 'SP2')
                         return `${App.config.api.baseUrl}/temp/sp2/${ip}`
-                    } else {
+                    else if( modelo == 'SP2+') 
                         return `${App.config.api.baseUrl}/temp/sp2plus/${ip}`
-                    }
+                    else 
+                        return `${App.config.api.baseUrl}/temp/ap8841/${ip}`
                 }
             }
         },
