@@ -1,4 +1,4 @@
-.contenedor-planta .contenedor-sensor{
+.contenedor-planta .contenedor-sensor {
     display: flex;
     flex-direction: column;
     width: 230px;
@@ -10,22 +10,25 @@
     /* background-color: goldenrod; */
 }
 
-.contenedor-sensor .contenedor-titulo-sensor{
-    font-size: 1.3rem;
+.contenedor-sensor .contenedor-titulo-sensor {
+    font-size: 1.19rem;
     display: flex;
     align-items: center;
     justify-content: center;
     width: 100%;
-    background-color:rgba(43, 52, 59, .3);
+    background-color: rgba(43, 52, 59, .3);
     border-radius: 5px;
 }
 
-.contenedor-titulo-sensor .link-titulo-sensor{
-    color:white;
+.contenedor-titulo-sensor .link-titulo-sensor {
+    color: white;
     text-decoration: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.contenedor-sensor .contenedor-sensores-cuerpo{
+.contenedor-sensor .contenedor-sensores-cuerpo {
     display: flex;
     width: 100%;
     height: 100%;
@@ -35,7 +38,7 @@
 }
 
 .contenedor-sensores-cuerpo .contenedor-sensor-temp,
-.contenedor-sensores-cuerpo .contenedor-sensor-hum{
+.contenedor-sensores-cuerpo .contenedor-sensor-hum {
     margin: 2px;
     display: flex;
     flex-direction: column;
@@ -43,8 +46,9 @@
     width: 50%;
     height: 100%;
 }
+
 .contenedor-sensor-temp .div-sensor-temp-icon,
-.contenedor-sensor-hum .div-sensor-hum-icon{
+.contenedor-sensor-hum .div-sensor-hum-icon {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -54,12 +58,15 @@
     /* border-radius: 5px; */
     /* border: 1px solid #e9ecf4; */
 }
+
 .contenedor-sensor-temp .div-sensor-temp-centro,
-.contenedor-sensor-hum .div-sensor-hum-centro{
+.contenedor-sensor-hum .div-sensor-hum-centro {
     position: relative;
     background-color: #e9ecf4;
-}.contenedor-sensor-temp .div-sensor-temp-centro button,
-.contenedor-sensor-hum .div-sensor-hum-centro button{
+}
+
+.contenedor-sensor-temp .div-sensor-temp-centro button,
+.contenedor-sensor-hum .div-sensor-hum-centro button {
     position: absolute;
     width: 100px;
     margin: auto;
@@ -71,8 +78,9 @@
     /* border-radius: 8px; */
     color: #e9ecf4;
 }
+
 .contenedor-sensor-temp .div-sensor-temp-temperatura,
-.contenedor-sensor-hum .div-sensor-hum-porcentaje{
+.contenedor-sensor-hum .div-sensor-hum-porcentaje {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -85,67 +93,69 @@
     /* border-radius: 5px; */
 }
 
-.contenedor-sensores-cuerpo .contenedor-sensor-hum{
+.contenedor-sensores-cuerpo .contenedor-sensor-hum {
     width: 50%;
     height: 100%;
 }
 
-.sensor-low-critical{
+.sensor-low-critical {
     background-color: #34E5F4;
     border: 1px solid #2DB0BB;
 }
 
-.sensor-low-warning{
-    background-color: #2984b3;;
+.sensor-low-warning {
+    background-color: #2984b3;
+    ;
     border: 1px solid #20709A;
 }
 
-.sensor-normal{
+.sensor-normal {
     /* background-color: #5ac462; */
     background-color: #419657;
     border: 1px solid #377848;
 }
 
-.sensor-high-warning{
+.sensor-high-warning {
     background-color: #FFDC3D;
     border: 1px solid #E1C235;
 }
 
-.sensor-high-critical{
+.sensor-high-critical {
     background-color: #f83c33;
     border: 1px solid #941814;
 }
 
-.opacidad{
+.opacidad {
     opacity: .1;
 }
 
-.warning-color{
+.warning-color {
     text-decoration: none;
-    color:#FDA705;
+    color: #FDA705;
 }
 
-@media screen and (max-width: 1444px){
-    .contenedor-planta .contenedor-sensor{
+@media screen and (max-width: 1444px) {
+    .contenedor-planta .contenedor-sensor {
         width: 150px;
         height: 120px;
         margin: 1.5px;
     }
 
-    .contenedor-sensor .contenedor-titulo-sensor{
+    .contenedor-sensor .contenedor-titulo-sensor {
         font-size: .8rem;
         width: 100%;
     }
 
     .contenedor-sensor-temp .div-sensor-temp-icon,
-    .contenedor-sensor-hum .div-sensor-hum-icon{
+    .contenedor-sensor-hum .div-sensor-hum-icon {
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: 1.4rem;
     }
+
     .contenedor-sensor-temp .div-sensor-temp-centro button,
-    .contenedor-sensor-hum .div-sensor-hum-centro button{
+    .contenedor-sensor-hum .div-sensor-hum-centro button {
         font-size: .6rem;
         width: 76px;
         margin: auto;
@@ -158,7 +168,7 @@
     }
 
     .contenedor-sensor-temp .div-sensor-temp-temperatura,
-    .contenedor-sensor-hum .div-sensor-hum-porcentaje{
+    .contenedor-sensor-hum .div-sensor-hum-porcentaje {
         font-size: 1rem;
         /* font-size: .93rem; */
         margin: 0 1.2em;
