@@ -11,9 +11,9 @@
                     // console.log(modelo)
                     if (modelo == 'SP2')
                         return `${App.config.api.baseUrl}/temp/sp2/${ip}`
-                    else if( modelo == 'SP2+') 
+                    else if (modelo == 'SP2+')
                         return `${App.config.api.baseUrl}/temp/sp2plus/${ip}`
-                    else 
+                    else
                         return `${App.config.api.baseUrl}/temp/ap8841/${ip}`
                 }
             }
@@ -63,6 +63,7 @@
                     const response = await App.utils.makeRequest({
                         url: App.config.api.getTemp(sensor.ip, sensor.modelo)
                     }, idc, archivo)
+                    console.log(response)
                     if (response) {
                         App.utils.actualizarSensor(response, idc)
                         window.setTimeout(getData, 20000)
@@ -247,52 +248,49 @@
                 })
                 // App.htmlElements.contenedorSensorPA.innerHTML = domSensor
             },
-            actualizarSensor: function (sensores, idc) {
-                var response_array = []
-                var objectValues = Object.values(sensores)
-                response_array.push(objectValues)
-                response_array.forEach(sensor => {
-                    // console.log(sensor)
-                    var contenedorTempIcono = document.getElementById(`div-sensor-temp-icon-${sensor[1]}`)
-                    var contenedorHumIcon = document.getElementById(`div-sensor-hum-icon-${sensor[1]}`)
-                    var btnTemp = document.getElementById(`btn-temp-${sensor[1]}`)
-                    var btnHum = document.getElementById(`btn-hum-${sensor[1]}`)
+            actualizarSensor: function (response, idc) {
+                const { ip, modelo, device, sensors } = response
 
-                    var tituloSensor = document.getElementById(`h3-${sensor[1]}`)
-                    var cuerpoSensor = document.getElementById(`sensores-cuerpo-${sensor[1]}`)
-                    var h3Temperatura = document.getElementById(`h2-temp-${sensor[1]}`)
-                    var h3Humedad = document.getElementById(`h2-hum-${sensor[1]}`)
-
-                    // return console.log(sensores) //ERROR: Seguir desde aquí!
-
-                    if (sensores.modelo == 'SP2+') {
-                        // console.log(sensor[0][2])
-                        App.setColoresTemp(Number(sensor[0][2] / 10), contenedorTempIcono, btnTemp)
-                        App.setColoresHum(sensor[0][3], contenedorHumIcon, btnHum)
-                    } else {
-                        App.setColoresTemp(sensor[0][2], contenedorTempIcono, btnTemp)
-                        App.setColoresHum(sensor[0][4], contenedorHumIcon, btnHum)
-                    }
-
-                    tituloSensor.innerHTML = `<a class="link-titulo-sensor" href="http://${sensor[1]}/" target="_blank">${sensor[0][0]}</a>`
-                    if (sensores.modelo == 'SP2+') {
-                        h3Temperatura.innerHTML = `${sensor[0][2] / 10}F°`
-                        h3Humedad.innerHTML = `${sensor[0][3]}%`
-                    } else {
-                        h3Temperatura.innerHTML = `${sensor[0][2]}F°`
-                        h3Humedad.innerHTML = `${sensor[0][4]}%`
-                    }
-                    cuerpoSensor.classList.remove('opacidad')
-                    if (sensor[2] != "") {
-                        cuerpoSensor.classList.add('opacidad')
-                        h3Temperatura.innerHTML = '<i class="fas fa-exclamation-circle warning-color"></i>'
-                        h3Humedad.innerHTML = '<i class="fas fa-exclamation-circle warning-color"></i>'
-                        tituloSensor.innerHTML = `<a class="warning-color" href="http://${sensor[1]}/" target="_blank">${sensor[1]}</a>`
-                    }
-                })
-                // console.log(headerDatacenter)
                 App.htmlElements.headerDatacenter.innerHTML = `Temperatura y Humedad ${idc}.`
+
+                sensors.forEach(sensorItem => {
+                    const sensorId = sensorItem.id ?? 0
+                    const temperatura = sensorItem.temperature ?? "-"
+                    const humedad = sensorItem.humidity ?? "-"
+                    const nombreSensor = sensorItem.name || ip
+
+                    const iconoTemp = document.getElementById(`div-sensor-temp-icon-${ip}`)
+                    const iconoHum = document.getElementById(`div-sensor-hum-icon-${ip}`)
+                    const botonTemp = document.getElementById(`btn-temp-${ip}`)
+                    const botonHum = document.getElementById(`btn-hum-${ip}`)
+                    const tituloCard = document.getElementById(`h3-${ip}`)
+                    const cuerpoCard = document.getElementById(`sensores-cuerpo-${ip}`)
+                    const textoTemp = document.getElementById(`h2-temp-${ip}`)
+                    const textoHum = document.getElementById(`h2-hum-${ip}`)
+
+                    if (!iconoTemp || !botonTemp) {
+                        console.warn(`No se encontró el contenedor del sensor ${ip}`)
+                        return
+                    }
+
+                    if (temperatura !== "-") {
+                        App.setColoresTemp(temperatura, iconoTemp, botonTemp)
+                        textoTemp.innerHTML = `${temperatura}°F`
+                    } else {
+                        textoTemp.innerHTML = "-"
+                    }
+
+                    if (humedad !== "-") {
+                        App.setColoresHum(humedad, iconoHum, botonHum)
+                        textoHum.innerHTML = `${humedad}%`
+                    } else {
+                        textoHum.innerHTML = "-"
+                    }
+                    tituloCard.innerHTML = `<a class="link-titulo-sensor" href="http://${ip}/" target="_blank">${device.name || nombreSensor}</a>`
+                    cuerpoCard?.classList.remove("opacidad")
+                })
             }
+
         }
     }
     App.init()
