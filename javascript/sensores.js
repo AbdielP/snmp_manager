@@ -7,7 +7,7 @@
         },
         htmlElements: {
             formSensores: document.querySelector('#form-add-sensor'),
-            tableSensores: document.querySelector('#sensores')
+            tableSensores: document.querySelector('#sensores-body')
         },
         init: () => {
             App.initializeData.getUrlSearchParams()

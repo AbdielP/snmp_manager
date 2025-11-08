@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,6 +10,7 @@
     <link rel="stylesheet" href="../css/html/sensores_css/estilos.css">
     <title>Sensores</title>
 </head>
+
 <body>
     <header>
         <h3>Listado de sensores</h3>
@@ -38,20 +40,26 @@
             </form>
         </div>
         <div class="contenedor-volver">
-            <a href="config.html"> < Volver a configuración</a>
+            <a href="config.html">
+                < Volver a configuración</a>
         </div>
         <div class="div-tabla">
             <table id="sensores">
-                <tr>
-                  <th>IP Sensor</th>
-                  <th>Ubicación</th>
-                  <th>Modelo</th>
-                  <th>Eliminar</th>
-                </tr>
+                <thead>
+                    <tr>
+                        <th>IP Sensor</th>
+                        <th>Ubicación</th>
+                        <th>Modelo</th>
+                        <th>Eliminar</th>
+                    </tr>
+                </thead>
+                <tbody id="sensores-body"></tbody>
             </table>
+
         </div>
     </main>
     <script src="../javascript/sensores.js"></script>
     <script src="../javascript/ipaddressfilter.js"></script>
 </body>
+
 </html>
