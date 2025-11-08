@@ -1,5 +1,8 @@
 (function () {
     var App = {
+        variables: {
+            activeIDC: null
+        },
         config: {
             api: {
                 // baseUrl: "http://172.18.227.178:3000",
@@ -34,48 +37,100 @@
         },
         events: {},
         //Leer documento de sensores
+        // Leer documento de sensores
         readSensores: function (archivo, idc) {
+            // Marca el IDC activo dentro del módulo
+            App.variables.activeIDC = idc
+
+            // Limpia el DOM y muestra animación
             App.clearSensoresDOM()
             App.animacionConectando()
+
             async function readData() {
                 const response = await App.utils.makeRequest({
                     url: App.config.api.readFile(archivo)
                 })
-                // console.log(response)
-                if (response) {
-                    App.utils.dibujarSensor(response.obj.sensores)
+
+                if (response && response.obj && Array.isArray(response.obj.sensores)) {
+                    // No dibujamos nada aquí; los cards se crearán al recibir data real
                     App.scanSensores(response.obj.sensores, idc, archivo)
                     App.removerAnimacionConectando()
                 } else {
                     App.removerAnimacionConectando()
-                    App.htmlElements.contenedorSensorPB.innerHTML = `<h3><i class="fas fa-exclamation-triangle"></i> --- SIN CONEXIÓN CON EL SERVIDOR --- <i class="fas fa-exclamation-triangle"></h3>`
-                    App.htmlElements.contenedorSensorPA.innerHTML = `<h3><i class="fas fa-exclamation-triangle"></i> --- SIN CONEXIÓN CON EL SERVIDOR --- <i class="fas fa-exclamation-triangle"></h3>`
+                    App.htmlElements.contenedorSensorPB.innerHTML =
+                        `<h3><i class="fas fa-exclamation-triangle"></i> --- SIN CONEXIÓN CON EL SERVIDOR --- <i class="fas fa-exclamation-triangle"></h3>`
+                    App.htmlElements.contenedorSensorPA.innerHTML =
+                        `<h3><i class="fas fa-exclamation-triangle"></i> --- SIN CONEXIÓN CON EL SERVIDOR --- <i class="fas fa-exclamation-triangle"></h3>`
                     window.setTimeout(readData, 5000)
                 }
             }
             readData()
         },
-        //GET sensores data
         scanSensores: function (sensores, idc, archivo) {
-            sensores.forEach(sensor => {
-                // console.log(sensor.ip)
+            sensores.forEach(sensorBase => {
                 async function getData() {
+                    // Si cambió de datacenter, abortar este ciclo
+                    if (App.variables.activeIDC !== idc) return
+
                     const response = await App.utils.makeRequest({
-                        url: App.config.api.getTemp(sensor.ip, sensor.modelo)
+                        url: App.config.api.getTemp(sensorBase.ip, sensorBase.modelo)
                     }, idc, archivo)
-                    console.log(response)
+
+                    // Aborta si cambió el IDC mientras cargaba
+                    if (App.variables.activeIDC !== idc) return
+
                     if (response) {
-                        App.utils.actualizarSensor(response, idc)
-                        window.setTimeout(getData, 20000)
+                        // Si el dispositivo tiene múltiples sensores (PDU)
+                        if (Array.isArray(response.sensors) && response.sensors.length > 1) {
+                            response.sensors.forEach(sensorItem => {
+                                // ID interno (solo para el DOM)
+                                const domId = `${response.ip}_s${sensorItem.id}`
+                                const cardId = `${sensorBase.planta} ${domId}`
+
+                                // Crear card si no existe
+                                if (!document.getElementById(cardId)) {
+                                    const newCard = {
+                                        planta: sensorBase.planta,
+                                        ip: domId,  // usado solo como ID
+                                        modelo: response.modelo
+                                    }
+                                    App.utils.dibujarSensor([newCard])
+                                }
+
+                                // Actualizar datos visuales
+                                App.utils.actualizarSensor({
+                                    ip: domId,
+                                    modelo: response.modelo,
+                                    device: response.device,
+                                    sensors: [sensorItem]
+                                }, idc)
+
+                                // Corrige el link del título para usar la IP real
+                                const titulo = document.getElementById(`h3-${domId}`)
+                                if (titulo)
+                                    titulo.innerHTML = `<a class="link-titulo-sensor" href="http://${response.ip}/" target="_blank">${response.device.name}</a>`
+                            })
+                        } else {
+                            // SP2 / SP2+
+                            const cardId = `${sensorBase.planta} ${response.ip}`
+                            if (!document.getElementById(cardId)) {
+                                App.utils.dibujarSensor([sensorBase])
+                            }
+                            App.utils.actualizarSensor(response, idc)
+                        }
+
+                        if (App.variables.activeIDC === idc)
+                            window.setTimeout(getData, 20000)
                     } else {
-                        App.animacionReconectando()
-                        window.setTimeout(function () { getData() }, 10000)
+                        if (App.variables.activeIDC === idc) {
+                            App.animacionReconectando()
+                            window.setTimeout(() => getData(), 10000)
+                        }
                     }
                 }
                 getData()
             })
-        },
-        clearSensoresDOM: function () {
+        }, clearSensoresDOM: function () {
             App.htmlElements.contenedorSensorPB.innerHTML = ""
             App.htmlElements.contenedorSensorPA.innerHTML = ""
         },
@@ -177,76 +232,49 @@
                 }
             },
             dibujarSensor: function (sensores) {
-                App.clearSensoresDOM()
-                let domSensorPA = ""
-                let domSensorPB = ""
+                let domSensorPA = App.htmlElements.contenedorSensorPA.innerHTML
+                let domSensorPB = App.htmlElements.contenedorSensorPB.innerHTML
+
                 sensores.forEach(sensor => {
-                    if (sensor.planta == 'PA') {
-                        domSensorPA += `<div class="contenedor-sensor" id="PA ${sensor.ip}">
-                                <div class="contenedor-titulo-sensor">
-                                    <h3 id="h3-${sensor.ip}">-</h3>
-                                </div>
-                                <div class="contenedor-sensores-cuerpo opacidad" id="sensores-cuerpo-${sensor.ip}">
-                                    <div class="contenedor-sensor-temp">
-                                    <div id="div-sensor-temp-icon-${sensor.ip}" class="div-sensor-temp-icon">
-                                        <img src="./assets/img/TEMP.png" alt="*" width="20">
-                                    </div>
-                                    <div class="div-sensor-temp-centro">
-                                        <button id="btn-temp-${sensor.ip}">Temperatura</button>
-                                    </div>
-                                    <div class="div-sensor-temp-temperatura">
-                                        <h2 id="h2-temp-${sensor.ip}">-</h2>
-                                    </div>
-                                    </div>
-                                    <div class="contenedor-sensor-hum">
-                                        <div id="div-sensor-hum-icon-${sensor.ip}" class="div-sensor-hum-icon">
-                                            <img src="./assets/img/HUM.png" alt="*" width="16">
-                                        </div>
-                                        <div class="div-sensor-hum-centro">
-                                            <button id="btn-hum-${sensor.ip}">Humedad</button>
-                                        </div>
-                                        <div class="div-sensor-hum-porcentaje">
-                                            <h2 id="h2-hum-${sensor.ip}">-</h2>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>`
-                        App.htmlElements.contenedorSensorPA.innerHTML = domSensorPA
-                    }
-                    if (sensor.planta == 'PB') {
-                        domSensorPB += `<div class="contenedor-sensor" id="PB ${sensor.ip}">
-                                        <div class="contenedor-titulo-sensor">
-                                            <h3 id="h3-${sensor.ip}">-</h3>
-                                        </div>
-                                        <div class="contenedor-sensores-cuerpo opacidad" id="sensores-cuerpo-${sensor.ip}">
-                                            <div class="contenedor-sensor-temp">
-                                            <div id="div-sensor-temp-icon-${sensor.ip}" class="div-sensor-temp-icon">
-                                                <img src="./assets/img/TEMP.png" alt="*" width="20">
-                                            </div>
-                                            <div class="div-sensor-temp-centro">
-                                                <button id="btn-temp-${sensor.ip}">Temperatura</button>
-                                            </div>
-                                            <div class="div-sensor-temp-temperatura">
-                                                <h2 id="h2-temp-${sensor.ip}">-</h2>
-                                            </div>
-                                            </div>
-                                            <div class="contenedor-sensor-hum">
-                                                <div id="div-sensor-hum-icon-${sensor.ip}" class="div-sensor-hum-icon">
-                                                    <img src="./assets/img/HUM.png" alt="*" width="16">
-                                                </div>
-                                                <div class="div-sensor-hum-centro">
-                                                    <button id="btn-hum-${sensor.ip}">Humedad</button>
-                                                </div>
-                                                <div class="div-sensor-hum-porcentaje">
-                                                    <h2 id="h2-hum-${sensor.ip}">-</h2>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>`
-                        App.htmlElements.contenedorSensorPB.innerHTML = domSensorPB
-                    }
+                    const cardHTML = `
+        <div class="contenedor-sensor" id="${sensor.planta} ${sensor.ip}">
+            <div class="contenedor-titulo-sensor">
+                <h3 id="h3-${sensor.ip}">-</h3>
+            </div>
+            <div class="contenedor-sensores-cuerpo opacidad" id="sensores-cuerpo-${sensor.ip}">
+                <div class="contenedor-sensor-temp">
+                    <div id="div-sensor-temp-icon-${sensor.ip}" class="div-sensor-temp-icon">
+                        <img src="./assets/img/TEMP.png" alt="*" width="20">
+                    </div>
+                    <div class="div-sensor-temp-centro">
+                        <button id="btn-temp-${sensor.ip}">Temperatura</button>
+                    </div>
+                    <div class="div-sensor-temp-temperatura">
+                        <h2 id="h2-temp-${sensor.ip}">-</h2>
+                    </div>
+                </div>
+                <div class="contenedor-sensor-hum">
+                    <div id="div-sensor-hum-icon-${sensor.ip}" class="div-sensor-hum-icon">
+                        <img src="./assets/img/HUM.png" alt="*" width="16">
+                    </div>
+                    <div class="div-sensor-hum-centro">
+                        <button id="btn-hum-${sensor.ip}">Humedad</button>
+                    </div>
+                    <div class="div-sensor-hum-porcentaje">
+                        <h2 id="h2-hum-${sensor.ip}">-</h2>
+                    </div>
+                </div>
+            </div>
+        </div>`
+
+                    if (sensor.planta === 'PA')
+                        domSensorPA += cardHTML
+                    else if (sensor.planta === 'PB')
+                        domSensorPB += cardHTML
                 })
-                // App.htmlElements.contenedorSensorPA.innerHTML = domSensor
+
+                App.htmlElements.contenedorSensorPA.innerHTML = domSensorPA
+                App.htmlElements.contenedorSensorPB.innerHTML = domSensorPB
             },
             actualizarSensor: function (response, idc) {
                 const { ip, modelo, device, sensors } = response
