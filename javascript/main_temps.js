@@ -1,325 +1,356 @@
 (function () {
     var App = {
         variables: {
-            activeIDC: null
+            activeIDC: null,
+            refreshTimer: null,
+            devicesIndex: new Map(), // domId -> { domId, ip, modelo, planta, name }
         },
         config: {
             api: {
-                // baseUrl: "http://172.18.227.178:3000",
                 baseUrl: "http://localhost:3000",
                 readFile: function (archivo) {
                     return `${App.config.api.baseUrl}/read/${archivo}`
                 },
                 getTemp: function (ip, modelo) {
-                    // console.log(modelo)
-                    if (modelo == 'SP2')
+                    if (modelo == "SP2")
                         return `${App.config.api.baseUrl}/temp/sp2/${ip}`
-                    else if (modelo == 'SP2+')
+                    else if (modelo == "SP2+")
                         return `${App.config.api.baseUrl}/temp/sp2plus/${ip}`
                     else
                         return `${App.config.api.baseUrl}/temp/ap8841/${ip}`
-                }
-            }
+                },
+            },
         },
         htmlElements: {
-            contenedor: document.querySelector('.contenedor'),
-            contenedor_reconnect: document.querySelector('.contenedor-reconectando'),
-            headerDatacenter: document.querySelector('.header-datacenter'),
-            btnIdcPp: document.querySelector('#btn-idc-pp'),
-            btnIdcBal: document.querySelector('#btn-idc-bal'),
-            contenedorLoading: document.getElementsByClassName('contenedor-loading'),
-            contenedorSensorPA: document.querySelector('#main-contenedor-sensor'),
-            contenedorSensorPB: document.querySelector('#main-contenedor-sensor-pb'),
-
-        }, init: function () {
-            App.htmlElements.btnIdcPp.addEventListener("click", function () { App.readSensores('sensorespp', 'IDC Panamá Pacífico') })
-            App.htmlElements.btnIdcBal.addEventListener("click", function () { App.readSensores('sensoresbal', 'IDC Balboa') })
+            contenedor: document.querySelector(".contenedor"),
+            contenedor_reconnect: document.querySelector(".contenedor-reconectando"),
+            headerDatacenter: document.querySelector(".header-datacenter"),
+            btnIdcPp: document.querySelector("#btn-idc-pp"),
+            btnIdcBal: document.querySelector("#btn-idc-bal"),
+            contenedorLoading: document.getElementsByClassName("contenedor-loading"),
+            contenedorSensorPA: document.querySelector("#main-contenedor-sensor"),
+            contenedorSensorPB: document.querySelector("#main-contenedor-sensor-pb"),
         },
-        events: {},
-        //Leer documento de sensores
-        // Leer documento de sensores
-        readSensores: function (archivo, idc) {
-            // Marca el IDC activo dentro del módulo
-            App.variables.activeIDC = idc
 
-            // Limpia el DOM y muestra animación
+        init: function () {
+            App.htmlElements.btnIdcPp.addEventListener("click", function () {
+                App.readSensores("sensorespp", "IDC Panamá Pacífico")
+            })
+            App.htmlElements.btnIdcBal.addEventListener("click", function () {
+                App.readSensores("sensoresbal", "IDC Balboa")
+            })
+        },
+
+        // Entrada principal
+        readSensores: function (archivo, idc) {
+            App.variables.activeIDC = idc;
+            App.htmlElements.headerDatacenter.innerHTML = `Temperatura y Humedad ${idc}.`
+
+            // limpiar UI y estados
             App.clearSensoresDOM()
             App.animacionConectando()
-
-            async function readData() {
-                const response = await App.utils.makeRequest({
-                    url: App.config.api.readFile(archivo)
-                })
-
-                if (response && response.obj && Array.isArray(response.obj.sensores)) {
-                    // No dibujamos nada aquí; los cards se crearán al recibir data real
-                    App.scanSensores(response.obj.sensores, idc, archivo)
-                    App.removerAnimacionConectando()
-                } else {
-                    App.removerAnimacionConectando()
-                    App.htmlElements.contenedorSensorPB.innerHTML =
-                        `<h3><i class="fas fa-exclamation-triangle"></i> --- SIN CONEXIÓN CON EL SERVIDOR --- <i class="fas fa-exclamation-triangle"></h3>`
-                    App.htmlElements.contenedorSensorPA.innerHTML =
-                        `<h3><i class="fas fa-exclamation-triangle"></i> --- SIN CONEXIÓN CON EL SERVIDOR --- <i class="fas fa-exclamation-triangle"></h3>`
-                    window.setTimeout(readData, 5000)
-                }
+            if (App.variables.refreshTimer) {
+                clearInterval(App.variables.refreshTimer)
+                App.variables.refreshTimer = null
             }
-            readData()
-        },
-        scanSensores: function (sensores, idc, archivo) {
-            sensores.forEach(sensorBase => {
-                async function getData() {
-                    // Si cambió de datacenter, abortar este ciclo
-                    if (App.variables.activeIDC !== idc) return
+            if (!(App.variables.devicesIndex instanceof Map)) {
+                App.variables.devicesIndex = new Map()
+            } else {
+                App.variables.devicesIndex.clear()
+            }
 
-                    const response = await App.utils.makeRequest({
-                        url: App.config.api.getTemp(sensorBase.ip, sensorBase.modelo)
-                    }, idc, archivo)
-
-                    // Aborta si cambió el IDC mientras cargaba
-                    if (App.variables.activeIDC !== idc) return
-
-                    if (response) {
-                        // Si el dispositivo tiene múltiples sensores (PDU)
-                        if (Array.isArray(response.sensors) && response.sensors.length > 1) {
-                            response.sensors.forEach(sensorItem => {
-                                // ID interno (solo para el DOM)
-                                const domId = `${response.ip}_s${sensorItem.id}`
-                                const cardId = `${sensorBase.planta} ${domId}`
-
-                                // Crear card si no existe
-                                if (!document.getElementById(cardId)) {
-                                    const newCard = {
-                                        planta: sensorBase.planta,
-                                        ip: domId,  // usado solo como ID
-                                        modelo: response.modelo
-                                    }
-                                    App.utils.dibujarSensor([newCard])
-                                }
-
-                                // Actualizar datos visuales
-                                App.utils.actualizarSensor({
-                                    ip: domId,
-                                    modelo: response.modelo,
-                                    device: response.device,
-                                    sensors: [sensorItem]
-                                }, idc)
-
-                                // Corrige el link del título para usar la IP real
-                                const titulo = document.getElementById(`h3-${domId}`)
-                                if (titulo)
-                                    titulo.innerHTML = `<a class="link-titulo-sensor" href="http://${response.ip}/" target="_blank">${response.device.name}</a>`
-                            })
-                        } else {
-                            // SP2 / SP2+
-                            const cardId = `${sensorBase.planta} ${response.ip}`
-                            if (!document.getElementById(cardId)) {
-                                App.utils.dibujarSensor([sensorBase])
-                            }
-                            App.utils.actualizarSensor(response, idc)
-                        }
-
-                        if (App.variables.activeIDC === idc)
-                            window.setTimeout(getData, 20000)
-                    } else {
-                        if (App.variables.activeIDC === idc) {
-                            App.animacionReconectando()
-                            window.setTimeout(() => getData(), 10000)
-                        }
-                    }
+            (async function loadAndRender() {
+                const base = await App.utils.makeRequest({ url: App.config.api.readFile(archivo) })
+                if (!base?.obj?.sensores || !Array.isArray(base.obj.sensores)) {
+                    App.removerAnimacionConectando()
+                    App.showNoServer()
+                    return
                 }
-                getData()
-            })
-        }, clearSensoresDOM: function () {
+
+                // 1) Pedimos TODO en paralelo
+                const requests = base.obj.sensores.map((s) =>
+                    App.utils
+                        .makeRequest({ url: App.config.api.getTemp(s.ip, s.modelo) })
+                        .then((r) => (r ? { ...r, planta: s.planta } : null))
+                        .catch(() => null)
+                )
+                const responses = await Promise.all(requests)
+                if (App.variables.activeIDC !== idc) return
+
+                // 2) Expandir todos los sensores usando el domId del backend
+                const devices = responses
+                    .filter((r) => r && r.device && r.device.name)
+                    .flatMap((r) => {
+                        if (Array.isArray(r.sensors) && r.sensors.length > 0) {
+                            return r.sensors.map((s) => ({
+                                ip: r.ip, // IP real
+                                domId: s.domId, // ← viene del backend
+                                modelo: r.modelo,
+                                planta: r.planta,
+                                name: r.device.name,
+                                device: r.device,
+                                sensor: {
+                                    temperature: s.temperature ?? "-",
+                                    humidity: s.humidity ?? "-",
+                                },
+                            }))
+                        }
+                        return [
+                            {
+                                ip: r.ip,
+                                domId: `${r.ip}-s0`,
+                                modelo: r.modelo,
+                                planta: r.planta,
+                                name: r.device.name,
+                                device: r.device,
+                                sensor: { temperature: "-", humidity: "-" },
+                            },
+                        ]
+                    })
+
+                // 3) Ordenar A–Z por nombre dentro de cada planta
+                const devicesPA = devices
+                    .filter((d) => d.planta === "PA")
+                    .sort((a, b) => a.name.localeCompare(b.name))
+                const devicesPB = devices
+                    .filter((d) => d.planta === "PB")
+                    .sort((a, b) => a.name.localeCompare(b.name))
+
+                // 4) Pintar todas las cards en un solo lote
+                App.utils.renderCardsBulk(devicesPA, devicesPB)
+
+                // 5) Guardar índice de actualización
+                devices.forEach((d) =>
+                    App.variables.devicesIndex.set(d.domId, {
+                        domId: d.domId,
+                        ip: d.ip,
+                        modelo: d.modelo,
+                        planta: d.planta,
+                        name: d.name,
+                    })
+                )
+
+                App.removerAnimacionConectando()
+
+                // 6) Refrescador periódico (solo actualiza valores)
+                App.variables.refreshTimer = setInterval(async () => {
+                    if (App.variables.activeIDC !== idc) {
+                        clearInterval(App.variables.refreshTimer)
+                        return
+                    }
+
+                    const list = Array.from(App.variables.devicesIndex.values())
+                    const uniqueIPs = [...new Set(list.map((d) => d.ip))]
+
+                    const tickReq = uniqueIPs.map((ip) => {
+                        const any = list.find((d) => d.ip === ip)
+                        return App.utils
+                            .makeRequest({ url: App.config.api.getTemp(ip, any.modelo) })
+                            .catch(() => null)
+                    })
+
+                    const tickRes = await Promise.all(tickReq)
+                    if (App.variables.activeIDC !== idc) return
+
+                    tickRes
+                        .filter(Boolean)
+                        .forEach((r) => {
+                            if (!Array.isArray(r.sensors)) return
+                            r.sensors.forEach((s) => {
+                                const domId = s.domId // ← ya viene del backend
+                                const entry = App.variables.devicesIndex.get(domId)
+                                if (!entry) return
+                                App.utils.updateCardValues({
+                                    domId,
+                                    ip: entry.ip,
+                                    name: entry.name,
+                                    temperatura: s.temperature ?? "-",
+                                    humedad: s.humidity ?? "-",
+                                })
+                            })
+                        })
+                }, 20000)
+            })()
+        },
+
+        clearSensoresDOM: function () {
             App.htmlElements.contenedorSensorPB.innerHTML = ""
             App.htmlElements.contenedorSensorPA.innerHTML = ""
         },
+
         animacionConectando: function () {
-            for (let contenedor of App.htmlElements.contenedorLoading) contenedor.style.display = "flex"
+            for (let c of App.htmlElements.contenedorLoading) c.style.display = "flex"
         },
         removerAnimacionConectando: function () {
-            for (let contenedor of App.htmlElements.contenedorLoading) contenedor.style.display = "none"
+            for (let c of App.htmlElements.contenedorLoading) c.style.display = "none"
         },
         animacionReconectando: function () {
-            // App.htmlElements.contenedor_reconnect.removeProperty('dislay')
             App.htmlElements.contenedor_reconnect.style.display = "block"
-            App.htmlElements.contenedor.style.opacity = .1
+            App.htmlElements.contenedor.style.opacity = 0.1
         },
         removerAnimacionReconectando: function () {
             App.htmlElements.contenedor_reconnect.style.display = "none"
             App.htmlElements.contenedor.style.opacity = 1
         },
+
+        showNoServer: function () {
+            const msg =
+                `<h3><i class="fas fa-exclamation-triangle"></i> --- SIN CONEXIÓN CON EL SERVIDOR --- <i class="fas fa-exclamation-triangle"></h3>`
+            App.htmlElements.contenedorSensorPA.innerHTML = msg
+            App.htmlElements.contenedorSensorPB.innerHTML = msg
+        },
+
         setColoresTemp: function (valores, contenedor, boton) {
             valores = parseInt(valores)
             App.removerClases(contenedor, boton)
             if (valores >= 87) {
-                contenedor.classList.add('sensor-high-critical')
-                boton.classList.add('sensor-high-critical')
-            }
-            else if (valores <= 86 && valores >= 78) {
-                contenedor.classList.add('sensor-high-warning')
-                boton.classList.add('sensor-high-warning')
-            }
-            else if (valores <= 77 && valores >= 67) {
-                contenedor.classList.add('sensor-normal')
-                boton.classList.add('sensor-normal')
-            }
-            else if (valores >= 58 && valores <= 66) {
-                contenedor.classList.add('sensor-low-warning')
-                boton.classList.add('sensor-low-warning')
-            }
-            else if (valores <= 57) {
-                contenedor.classList.add('sensor-low-critical')
-                boton.classList.add('sensor-low-critical')
+                contenedor.classList.add("sensor-high-critical")
+                boton.classList.add("sensor-high-critical")
+            } else if (valores <= 86 && valores >= 78) {
+                contenedor.classList.add("sensor-high-warning")
+                boton.classList.add("sensor-high-warning")
+            } else if (valores <= 77 && valores >= 67) {
+                contenedor.classList.add("sensor-normal")
+                boton.classList.add("sensor-normal")
+            } else if (valores >= 58 && valores <= 66) {
+                contenedor.classList.add("sensor-low-warning")
+                boton.classList.add("sensor-low-warning")
+            } else if (valores <= 57) {
+                contenedor.classList.add("sensor-low-critical")
+                boton.classList.add("sensor-low-critical")
             } else {
                 App.removerClases(contenedor, boton)
             }
         },
+
         setColoresHum: function (valores, contenedor, boton) {
             App.removerClases(contenedor, boton)
             if (valores >= 80) {
-                App.removerClases(contenedor, boton)
-                contenedor.classList.add('sensor-high-critical')
-                boton.classList.add('sensor-high-critical')
-            }
-            else if (valores <= 79 && valores >= 66) {
-                App.removerClases(contenedor, boton)
-                contenedor.classList.add('sensor-high-warning')
-                boton.classList.add('sensor-high-warning')
-            }
-            else if (valores >= 45 && valores <= 65) {
-                App.removerClases(contenedor, boton)
-                contenedor.classList.add('sensor-normal')
-                boton.classList.add('sensor-normal')
-            }
-            else if (valores >= 30 && valores <= 44) {
-                App.removerClases(contenedor, boton)
-                contenedor.classList.add('sensor-low-warning')
-                boton.classList.add('sensor-low-warning')
+                contenedor.classList.add("sensor-high-critical")
+                boton.classList.add("sensor-high-critical")
+            } else if (valores <= 79 && valores >= 66) {
+                contenedor.classList.add("sensor-high-warning")
+                boton.classList.add("sensor-high-warning")
+            } else if (valores >= 45 && valores <= 65) {
+                contenedor.classList.add("sensor-normal")
+                boton.classList.add("sensor-normal")
+            } else if (valores >= 30 && valores <= 44) {
+                contenedor.classList.add("sensor-low-warning")
+                boton.classList.add("sensor-low-warning")
             } else if (valores <= 29) {
-                contenedor.classList.add('sensor-low-critical')
-                boton.classList.add('sensor-low-critical')
-            }
-            else {
-                App.removerClases(contenedor, boton)
+                contenedor.classList.add("sensor-low-critical")
+                boton.classList.add("sensor-low-critical")
             }
         },
-        removerClases: function (contenedor, boton) {
-            contenedor.classList.remove('sensor-high-critical')
-            contenedor.classList.remove('sensor-high-warning')
-            contenedor.classList.remove('sensor-normal')
-            contenedor.classList.remove('sensor-low-warning')
-            contenedor.classList.remove('sensor-low-critical')
 
-            boton.classList.remove('sensor-high-critical')
-            boton.classList.remove('sensor-high-warning')
-            boton.classList.remove('sensor-normal')
-            boton.classList.remove('sensor-low-warning')
-            boton.classList.remove('sensor-low-critical')
+        removerClases: function (contenedor, boton) {
+            contenedor.classList.remove(
+                "sensor-high-critical",
+                "sensor-high-warning",
+                "sensor-normal",
+                "sensor-low-warning",
+                "sensor-low-critical"
+            );
+            boton.classList.remove(
+                "sensor-high-critical",
+                "sensor-high-warning",
+                "sensor-normal",
+                "sensor-low-warning",
+                "sensor-low-critical"
+            );
         },
+
         utils: {
-            makeRequest: async function ({ method = "get", url, body = null }, idc, archivo) {
+            makeRequest: async function ({ method = "get", url, body = null }) {
                 try {
                     const response = await fetch(url, {
                         method,
-                        body: body ? JSON.stringify(body) : null
+                        body: body ? JSON.stringify(body) : null,
                     })
                     App.removerAnimacionReconectando()
                     return response.json()
                 } catch (error) {
-                    //este try ctch no hace nada realmente
                     console.log(error)
                 }
             },
-            dibujarSensor: function (sensores) {
-                let domSensorPA = App.htmlElements.contenedorSensorPA.innerHTML
-                let domSensorPB = App.htmlElements.contenedorSensorPB.innerHTML
 
-                sensores.forEach(sensor => {
-                    const cardHTML = `
-        <div class="contenedor-sensor" id="${sensor.planta} ${sensor.ip}">
+            renderCardsBulk: function (devicesPA, devicesPB) {
+                const buildCard = (d) => `
+        <div class="contenedor-sensor" id="${d.planta} ${d.domId}">
             <div class="contenedor-titulo-sensor">
-                <h3 id="h3-${sensor.ip}">-</h3>
+                <h3 id="h3-${d.domId}">
+                    <a class="link-titulo-sensor" href="http://${d.ip}/" target="_blank">${d.name}</a>
+                </h3>
             </div>
-            <div class="contenedor-sensores-cuerpo opacidad" id="sensores-cuerpo-${sensor.ip}">
+            <div class="contenedor-sensores-cuerpo" id="sensores-cuerpo-${d.domId}">
                 <div class="contenedor-sensor-temp">
-                    <div id="div-sensor-temp-icon-${sensor.ip}" class="div-sensor-temp-icon">
-                        <img src="./assets/img/TEMP.png" alt="*" width="20">
+                    <div id="div-sensor-temp-icon-${d.domId}" class="div-sensor-temp-icon">
+                        <img src="./assets/img/TEMP.png" width="20">
                     </div>
                     <div class="div-sensor-temp-centro">
-                        <button id="btn-temp-${sensor.ip}">Temperatura</button>
+                        <button id="btn-temp-${d.domId}">Temperatura</button>
                     </div>
                     <div class="div-sensor-temp-temperatura">
-                        <h2 id="h2-temp-${sensor.ip}">-</h2>
+                        <h2 id="h2-temp-${d.domId}">-</h2>
                     </div>
                 </div>
                 <div class="contenedor-sensor-hum">
-                    <div id="div-sensor-hum-icon-${sensor.ip}" class="div-sensor-hum-icon">
-                        <img src="./assets/img/HUM.png" alt="*" width="16">
+                    <div id="div-sensor-hum-icon-${d.domId}" class="div-sensor-hum-icon">
+                        <img src="./assets/img/HUM.png" width="16">
                     </div>
                     <div class="div-sensor-hum-centro">
-                        <button id="btn-hum-${sensor.ip}">Humedad</button>
+                        <button id="btn-hum-${d.domId}">Humedad</button>
                     </div>
                     <div class="div-sensor-hum-porcentaje">
-                        <h2 id="h2-hum-${sensor.ip}">-</h2>
+                        <h2 id="h2-hum-${d.domId}">-</h2>
                     </div>
                 </div>
             </div>
         </div>`
 
-                    if (sensor.planta === 'PA')
-                        domSensorPA += cardHTML
-                    else if (sensor.planta === 'PB')
-                        domSensorPB += cardHTML
-                })
+                App.htmlElements.contenedorSensorPA.innerHTML = devicesPA.map(buildCard).join("")
+                App.htmlElements.contenedorSensorPB.innerHTML = devicesPB.map(buildCard).join("")
 
-                App.htmlElements.contenedorSensorPA.innerHTML = domSensorPA
-                App.htmlElements.contenedorSensorPB.innerHTML = domSensorPB
+                devicesPA.concat(devicesPB).forEach((d) => {
+                    App.utils.updateCardValues({
+                        domId: d.domId,
+                        ip: d.ip,
+                        name: d.name,
+                        planta: d.planta,
+                        temperatura: d.sensor?.temperature ?? "-",
+                        humedad: d.sensor?.humidity ?? "-",
+                    })
+                })
             },
-            actualizarSensor: function (response, idc) {
-                const { ip, modelo, device, sensors } = response
 
-                App.htmlElements.headerDatacenter.innerHTML = `Temperatura y Humedad ${idc}.`
+            updateCardValues: function ({ domId, ip, name, temperatura, humedad }) {
+                const iconoTemp = document.getElementById(`div-sensor-temp-icon-${domId}`)
+                const iconoHum = document.getElementById(`div-sensor-hum-icon-${domId}`)
+                const botonTemp = document.getElementById(`btn-temp-${domId}`)
+                const botonHum = document.getElementById(`btn-hum-${domId}`)
+                const tituloCard = document.getElementById(`h3-${domId}`)
+                const textoTemp = document.getElementById(`h2-temp-${domId}`)
+                const textoHum = document.getElementById(`h2-hum-${domId}`)
 
-                sensors.forEach(sensorItem => {
-                    const sensorId = sensorItem.id ?? 0
-                    const temperatura = sensorItem.temperature ?? "-"
-                    const humedad = sensorItem.humidity ?? "-"
-                    const nombreSensor = sensorItem.name || ip
+                if (!iconoTemp || !botonTemp) return
 
-                    const iconoTemp = document.getElementById(`div-sensor-temp-icon-${ip}`)
-                    const iconoHum = document.getElementById(`div-sensor-hum-icon-${ip}`)
-                    const botonTemp = document.getElementById(`btn-temp-${ip}`)
-                    const botonHum = document.getElementById(`btn-hum-${ip}`)
-                    const tituloCard = document.getElementById(`h3-${ip}`)
-                    const cuerpoCard = document.getElementById(`sensores-cuerpo-${ip}`)
-                    const textoTemp = document.getElementById(`h2-temp-${ip}`)
-                    const textoHum = document.getElementById(`h2-hum-${ip}`)
+                tituloCard.innerHTML = `<a class="link-titulo-sensor" href="http://${ip}/" target="_blank">${name}</a>`
 
-                    if (!iconoTemp || !botonTemp) {
-                        console.warn(`No se encontró el contenedor del sensor ${ip}`)
-                        return
-                    }
+                if (temperatura !== "-" && temperatura !== undefined) {
+                    App.setColoresTemp(temperatura, iconoTemp, botonTemp)
+                    textoTemp.innerHTML = `${temperatura}°F`
+                } else {
+                    textoTemp.innerHTML = "-"
+                }
 
-                    if (temperatura !== "-") {
-                        App.setColoresTemp(temperatura, iconoTemp, botonTemp)
-                        textoTemp.innerHTML = `${temperatura}°F`
-                    } else {
-                        textoTemp.innerHTML = "-"
-                    }
-
-                    if (humedad !== "-") {
-                        App.setColoresHum(humedad, iconoHum, botonHum)
-                        textoHum.innerHTML = `${humedad}%`
-                    } else {
-                        textoHum.innerHTML = "-"
-                    }
-                    tituloCard.innerHTML = `<a class="link-titulo-sensor" href="http://${ip}/" target="_blank">${device.name || nombreSensor}</a>`
-                    cuerpoCard?.classList.remove("opacidad")
-                })
-            }
-
-        }
+                if (humedad !== "-" && humedad !== undefined) {
+                    App.setColoresHum(humedad, iconoHum, botonHum)
+                    textoHum.innerHTML = `${humedad}%`
+                } else {
+                    textoHum.innerHTML = "-"
+                }
+            },
+        },
     }
     App.init()
 })()
