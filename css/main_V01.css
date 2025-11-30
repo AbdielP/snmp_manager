@@ -93,6 +93,28 @@ body{
     align-items: center;
 }
 
+/* BOTONES SORTING */
+.filtros-sorting{
+    display: flex;
+    /* justify-content: center; */
+    align-items: center;
+    margin: 10px 0;
+}
+
+.btn-sorting{
+    cursor: pointer;
+    background-color: #2B343B;
+    color: #e9ecf4;
+    border: none;
+    padding: 8px 12px;
+    margin: 0 5px;
+    border-radius: 5px;
+    font-size: 0.9rem;
+}.btn-sorting:hover{
+    background-color: #5BC364;
+    color: #23252c;
+}
+
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }

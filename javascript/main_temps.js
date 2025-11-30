@@ -4,6 +4,9 @@
             activeIDC: null,
             refreshTimer: null,
             devicesIndex: new Map(), // domId -> { domId, ip, modelo, planta, name }
+            fullDeviceList: [],
+            sortMode: "AZ",
+            filterPlanta: "ALL",
         },
         config: {
             api: {
@@ -38,6 +41,35 @@
             })
             App.htmlElements.btnIdcBal.addEventListener("click", function () {
                 App.readSensores("sensoresbal", "IDC Balboa")
+            })
+            // Sorting A-Z
+            document.getElementById("sort-az").addEventListener("click", function () {
+                App.variables.sortMode = "AZ"
+                App.utils.applyFiltersAndRender()
+            })
+
+            // Sorting Z-A
+            document.getElementById("sort-za").addEventListener("click", function () {
+                App.variables.sortMode = "ZA"
+                App.utils.applyFiltersAndRender()
+            })
+
+            // Filtro: Todos
+            document.getElementById("filter-all").addEventListener("click", function () {
+                App.variables.filterPlanta = "ALL"
+                App.utils.applyFiltersAndRender()
+            })
+
+            // Filtro: Solo PA
+            document.getElementById("filter-pa").addEventListener("click", function () {
+                App.variables.filterPlanta = "PA"
+                App.utils.applyFiltersAndRender()
+            })
+
+            // Filtro: Solo PB
+            document.getElementById("filter-pb").addEventListener("click", function () {
+                App.variables.filterPlanta = "PB"
+                App.utils.applyFiltersAndRender()
             })
         },
 
@@ -108,18 +140,14 @@
                         ]
                     })
 
+                // Guardar lista completa para sorting/filtrado en frontend
+                App.variables.fullDeviceList = devices.slice()
+
+
                 // 3) Ordenar A–Z por nombre dentro de cada planta
-                const devicesPA = devices
-                    .filter((d) => d.planta === "PA")
-                    .sort((a, b) => a.name.localeCompare(b.name))
-                const devicesPB = devices
-                    .filter((d) => d.planta === "PB")
-                    .sort((a, b) => a.name.localeCompare(b.name))
+                App.utils.applyFiltersAndRender();
 
-                // 4) Pintar todas las cards en un solo lote
-                App.utils.renderCardsBulk(devicesPA, devicesPB)
-
-                // 5) Guardar índice de actualización
+                // 4) Guardar índice de actualización
                 devices.forEach((d) =>
                     App.variables.devicesIndex.set(d.domId, {
                         domId: d.domId,
@@ -132,7 +160,7 @@
 
                 App.removerAnimacionConectando()
 
-                // 6) Refrescador periódico (solo actualiza valores)
+                // 5) Refrescador periódico (solo actualiza valores)
                 App.variables.refreshTimer = setInterval(async () => {
                     if (App.variables.activeIDC !== idc) {
                         clearInterval(App.variables.refreshTimer)
@@ -350,6 +378,31 @@
                     textoHum.innerHTML = "-"
                 }
             },
+            applyFiltersAndRender: function () {
+                // 1. Copiar lista completa
+                let list = [...App.variables.fullDeviceList]
+
+                // 2. FILTRO POR PLANTA
+                if (App.variables.filterPlanta === "PA") {
+                    list = list.filter(d => d.planta === "PA")
+                } else if (App.variables.filterPlanta === "PB") {
+                    list = list.filter(d => d.planta === "PB")
+                }
+
+                // 3. SORT
+                if (App.variables.sortMode === "AZ") {
+                    list.sort((a, b) => a.name.localeCompare(b.name))
+                } else if (App.variables.sortMode === "ZA") {
+                    list.sort((a, b) => b.name.localeCompare(a.name))
+                }
+
+                // 4. DIVIDIR POR PLANTA
+                const pa = list.filter(d => d.planta === "PA")
+                const pb = list.filter(d => d.planta === "PB")
+
+                // 5. RENDER
+                App.utils.renderCardsBulk(pa, pb)
+            }
         },
     }
     App.init()

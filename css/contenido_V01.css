@@ -36,9 +36,10 @@
     border: 1px solid #5BC364;
 }
 
+/* ESTO SEPARA LAS SECCIONES EN INDEX.HTML */
 .contenido-principal{
     padding: 20px;
-    display: flex;
+    /* display: flex; */
     /* flex-direction: column; */
     flex-wrap: wrap;
 }

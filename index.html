@@ -1,16 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css?family=Crimson+Text|Muli&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/main_V01.css"> 
+    <link rel="stylesheet" href="css/main_V01.css">
     <link rel="stylesheet" href="css/header_V01.css">
     <link rel="stylesheet" href="css/contenido_V01.css">
     <link rel="stylesheet" href="css/sensores_V01.css">
     <link rel="stylesheet" href="css/sidebar_V01.css">
     <title>T&H IDC</title>
 </head>
+
 <body>
     <div class="contenedor">
         <header class="header">
@@ -29,7 +31,8 @@
                 <img src="./assets/img/liberty_logo.png" alt="" width="38">
             </dvi>
             <div class="sidebar-contenido">
-                <button type="button" class="menu-item" id="btn-temperaturas"><img src="./assets/img/TEMP.png" alt="" width="20"> Temperaturas</button>
+                <button type="button" class="menu-item" id="btn-temperaturas"><img src="./assets/img/TEMP.png" alt=""
+                        width="20"> Temperaturas</button>
             </div>
             <div class="sidebar-contenido">
                 <a class="menu-item-a" href="./html/config.html"><i class="fas fa-cogs"></i> Configuración</a>
@@ -55,18 +58,29 @@
             </div>
 
             <div class="contenido-principal">
+                <!-- SORTING -->
+                <div class="filtros-sorting">
+                    <button class="btn-sorting" id="sort-az">A–Z</button>
+                    <button class="btn-sorting" id="sort-za">Z–A</button>
+
+                    <button class="btn-sorting" id="filter-all">Todos</button>
+                    <button class="btn-sorting" id="filter-pa">Solo PA</button>
+                    <button class="btn-sorting" id="filter-pb">Solo PB</button>
+                </div>
+                <!-- FINAL SORTING -->
+
                 <div class="contenedor-planta" id="contenedor-planta">
                     <div class="planta-titulo">
                         <h2>Planta Alta</h2>
                     </div>
-                    
+
                     <div class="contenedor-loading">
-                        <div class="loader"></div> 
+                        <div class="loader"></div>
                         <h4>Cargando</h4>
                     </div>
                     <!-- CONTENEDOR DE SENSORES!!!!! -->
                     <div class="main-contenedor-sensor" id="main-contenedor-sensor">
-                    
+
                     </div>
                 </div>
 
@@ -75,7 +89,7 @@
                         <h2>Planta Baja</h2>
                     </div>
                     <div class="contenedor-loading">
-                        <div class="loader"></div> 
+                        <div class="loader"></div>
                         <h4>Cargando</h4>
                     </div>
                     <!-- CONTENEDOR DE SENSORES!!!!! -->
@@ -92,7 +106,7 @@
 
     <div class="contenedor-reconectando">
         <div class="contenedor-loading-reconectando">
-            <div class="loader-reconnect"></div> 
+            <div class="loader-reconnect"></div>
             <h2>Reconectando...</h2>
         </div>
     </div>
@@ -101,4 +115,5 @@
     <script src="./javascript/main_temps.js"></script>
     <!-- <script src="./javascript/main-obf.js"></script> -->
 </body>
+
 </html>
