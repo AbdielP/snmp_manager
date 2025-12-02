@@ -7,6 +7,7 @@
             fullDeviceList: [],
             sortMode: "AZ",
             filterPlanta: "ALL",
+            filterTipo: "ALL" // ALL | AKCP | PDU
         },
         config: {
             api: {
@@ -33,6 +34,15 @@
             contenedorLoading: document.getElementsByClassName("contenedor-loading"),
             contenedorSensorPA: document.querySelector("#main-contenedor-sensor"),
             contenedorSensorPB: document.querySelector("#main-contenedor-sensor-pb"),
+            // Botones filtro
+            btnSortAZ: document.querySelector("#sort-az"),
+            btnSortZA: document.querySelector("#sort-za"),
+            btnFilterAll: document.querySelector("#filter-all"),
+            btnFilterPA: document.querySelector("#filter-pa"),
+            btnFilterPB: document.querySelector("#filter-pb"),
+            btnFilterTipoAll: document.querySelector("#filter-tipo-all"),
+            btnFilterTipoAKCP: document.querySelector("#filter-akcp"),
+            btnFilterTipoPDU: document.querySelector("#filter-pdu"),
         },
 
         init: function () {
@@ -43,34 +53,59 @@
                 App.readSensores("sensoresbal", "IDC Balboa")
             })
             // Sorting A-Z
-            document.getElementById("sort-az").addEventListener("click", function () {
+            App.htmlElements.btnSortAZ.addEventListener("click", function () {
                 App.variables.sortMode = "AZ"
                 App.utils.applyFiltersAndRender()
+                App.utils.updateFilterButtons()
             })
 
             // Sorting Z-A
-            document.getElementById("sort-za").addEventListener("click", function () {
+            App.htmlElements.btnSortZA.addEventListener("click", function () {
                 App.variables.sortMode = "ZA"
                 App.utils.applyFiltersAndRender()
+                App.utils.updateFilterButtons()
             })
 
             // Filtro: Todos
-            document.getElementById("filter-all").addEventListener("click", function () {
+            App.htmlElements.btnFilterAll.addEventListener("click", function () {
                 App.variables.filterPlanta = "ALL"
                 App.utils.applyFiltersAndRender()
+                App.utils.updateFilterButtons()
             })
 
             // Filtro: Solo PA
-            document.getElementById("filter-pa").addEventListener("click", function () {
+            App.htmlElements.btnFilterPA.addEventListener("click", function () {
                 App.variables.filterPlanta = "PA"
                 App.utils.applyFiltersAndRender()
+                App.utils.updateFilterButtons()
             })
 
             // Filtro: Solo PB
-            document.getElementById("filter-pb").addEventListener("click", function () {
+            App.htmlElements.btnFilterPB.addEventListener("click", function () {
                 App.variables.filterPlanta = "PB"
                 App.utils.applyFiltersAndRender()
+                App.utils.updateFilterButtons()
             })
+
+            App.htmlElements.btnFilterTipoAll.addEventListener("click", () => {
+                App.variables.filterTipo = "ALL"
+                App.utils.applyFiltersAndRender()
+                App.utils.updateFilterButtons()
+            })
+
+            App.htmlElements.btnFilterTipoAKCP.addEventListener("click", () => {
+                App.variables.filterTipo = "AKCP"
+                App.utils.applyFiltersAndRender()
+                App.utils.updateFilterButtons()
+            })
+
+            App.htmlElements.btnFilterTipoPDU.addEventListener("click", () => {
+                App.variables.filterTipo = "PDU"
+                App.utils.applyFiltersAndRender()
+                App.utils.updateFilterButtons()
+            })
+            
+            App.utils.updateFilterButtons()
         },
 
         // Entrada principal
@@ -118,6 +153,10 @@
                                 ip: r.ip, // IP real
                                 domId: s.domId, // ← viene del backend
                                 modelo: r.modelo,
+                                tipo:
+                                    r.modelo === "SP2" || r.modelo === "SP2+"
+                                        ? "AKCP"
+                                        : "PDU",
                                 planta: r.planta,
                                 name: r.device.name,
                                 device: r.device,
@@ -389,6 +428,11 @@
                     list = list.filter(d => d.planta === "PB")
                 }
 
+                // 2.5 FILTRAR POR TIPO ← AQUÍ
+                if (App.variables.filterTipo !== "ALL") {
+                    list = list.filter(d => d.tipo === App.variables.filterTipo)
+                }
+
                 // 3. SORT
                 if (App.variables.sortMode === "AZ") {
                     list.sort((a, b) => a.name.localeCompare(b.name))
@@ -402,8 +446,46 @@
 
                 // 5. RENDER
                 App.utils.renderCardsBulk(pa, pb)
+            },
+            updateFilterButtons: function () {
+                // IDs a limpiar
+                const ids = [
+                    "sort-az", "sort-za",
+                    "filter-all", "filter-pa", "filter-pb",
+                    "filter-tipo-all", "filter-akcp", "filter-pdu"
+                ]
+
+                ids.forEach((id) => {
+                    const btn = document.getElementById(id)
+                    if (btn) btn.classList.remove("btn-active")
+                })
+
+                // SORT
+                if (App.variables.sortMode === "AZ") {
+                    document.getElementById("sort-az")?.classList.add("btn-active")
+                } else {
+                    document.getElementById("sort-za")?.classList.add("btn-active")
+                }
+
+                // PLANTA
+                if (App.variables.filterPlanta === "ALL") {
+                    document.getElementById("filter-all")?.classList.add("btn-active")
+                } else if (App.variables.filterPlanta === "PA") {
+                    document.getElementById("filter-pa")?.classList.add("btn-active")
+                } else if (App.variables.filterPlanta === "PB") {
+                    document.getElementById("filter-pb")?.classList.add("btn-active")
+                }
+
+                // TIPO
+                if (App.variables.filterTipo === "ALL") {
+                    document.getElementById("filter-tipo-all")?.classList.add("btn-active")
+                } else if (App.variables.filterTipo === "AKCP") {
+                    document.getElementById("filter-akcp")?.classList.add("btn-active")
+                } else if (App.variables.filterTipo === "PDU") {
+                    document.getElementById("filter-pdu")?.classList.add("btn-active")
+                }
             }
-        },
+        }
     }
     App.init()
 })()
