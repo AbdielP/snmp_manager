@@ -3,7 +3,7 @@
         variables: {
             sensoresFile: '',
             // servidorURL: "http://172.18.227.178:3000"
-            servidorURL: 'http://localhost:3000'
+            servidorURL: '/api'
         },
         htmlElements: {
             formSensores: document.querySelector('#form-add-sensor'),
@@ -47,8 +47,10 @@
             getSensores: async () => {
                 const sensores = await fetch(`${App.variables.servidorURL}/read/${App.variables.sensoresFile}`, {
                     method: 'GET',
+                    cache: "no-store",
                     headers: {
                         Accept: 'application/json',
+                        "Cache-Control": "no-cache",
                     }
                 })
                 const result = await sensores.json()

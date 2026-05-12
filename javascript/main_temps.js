@@ -11,7 +11,7 @@
         },
         config: {
             api: {
-                baseUrl: "http://localhost:3000",
+                baseUrl: "/api",
                 readFile: function (archivo) {
                     return `${App.config.api.baseUrl}/read/${archivo}`
                 },
@@ -138,28 +138,33 @@
                 const requests = base.obj.sensores.map((s) =>
                     App.utils
                         .makeRequest({ url: App.config.api.getTemp(s.ip, s.modelo) })
-                        .then((r) => (r ? { ...r, planta: s.planta } : null))
-                        .catch(() => null)
+                        .then((r) => ({ ...(r || {}), source: s, planta: s.planta }))
+                        .catch(() => ({ source: s, planta: s.planta }))
                 )
                 const responses = await Promise.all(requests)
                 if (App.variables.activeIDC !== idc) return
 
                 // 2) Expandir todos los sensores usando el domId del backend
                 const devices = responses
-                    .filter((r) => r && r.device && r.device.name)
                     .flatMap((r) => {
+                        const source = r.source || {}
+                        const ip = r.ip || source.ip
+                        const modelo = r.modelo || source.modelo
+                        const name = r.device?.name || ip
+                        const device = r.device || { name, location: "" }
+
                         if (Array.isArray(r.sensors) && r.sensors.length > 0) {
                             return r.sensors.map((s) => ({
-                                ip: r.ip, // IP real
+                                ip: ip, // IP real
                                 domId: s.domId, // ← viene del backend
-                                modelo: r.modelo,
+                                modelo: modelo,
                                 tipo:
-                                    r.modelo === "SP2" || r.modelo === "SP2+"
+                                    modelo === "SP2" || modelo === "SP2+"
                                         ? "AKCP"
                                         : "PDU",
                                 planta: r.planta,
-                                name: r.device.name,
-                                device: r.device,
+                                name: name,
+                                device: device,
                                 sensor: {
                                     temperature: s.temperature ?? "-",
                                     humidity: s.humidity ?? "-",
@@ -168,12 +173,16 @@
                         }
                         return [
                             {
-                                ip: r.ip,
-                                domId: `${r.ip}-s0`,
-                                modelo: r.modelo,
+                                ip: ip,
+                                domId: `${ip}-s0`,
+                                modelo: modelo,
+                                tipo:
+                                    modelo === "SP2" || modelo === "SP2+"
+                                        ? "AKCP"
+                                        : "PDU",
                                 planta: r.planta,
-                                name: r.device.name,
-                                device: r.device,
+                                name: name,
+                                device: device,
                                 sensor: { temperature: "-", humidity: "-" },
                             },
                         ]
@@ -227,6 +236,12 @@
                                 const domId = s.domId // ← ya viene del backend
                                 const entry = App.variables.devicesIndex.get(domId)
                                 if (!entry) return
+                                const liveName = r.device?.name || entry.name
+                                if (liveName && liveName !== entry.name) {
+                                    entry.name = liveName
+                                    const fullDevice = App.variables.fullDeviceList.find((d) => d.domId === domId)
+                                    if (fullDevice) fullDevice.name = liveName
+                                }
                                 App.utils.updateCardValues({
                                     domId,
                                     ip: entry.ip,
@@ -252,12 +267,20 @@
             for (let c of App.htmlElements.contenedorLoading) c.style.display = "none"
         },
         animacionReconectando: function () {
-            App.htmlElements.contenedor_reconnect.style.display = "block"
-            App.htmlElements.contenedor.style.opacity = 0.1
+            if (App.htmlElements.contenedor_reconnect) {
+                App.htmlElements.contenedor_reconnect.style.display = "flex"
+            }
+            if (App.htmlElements.contenedor) {
+                App.htmlElements.contenedor.style.opacity = 0.1
+            }
         },
         removerAnimacionReconectando: function () {
-            App.htmlElements.contenedor_reconnect.style.display = "none"
-            App.htmlElements.contenedor.style.opacity = 1
+            if (App.htmlElements.contenedor_reconnect) {
+                App.htmlElements.contenedor_reconnect.style.display = "none"
+            }
+            if (App.htmlElements.contenedor) {
+                App.htmlElements.contenedor.style.opacity = 1
+            }
         },
 
         showNoServer: function () {
@@ -332,12 +355,19 @@
                 try {
                     const response = await fetch(url, {
                         method,
+                        cache: "no-store",
+                        headers: {
+                            "Cache-Control": "no-cache",
+                        },
                         body: body ? JSON.stringify(body) : null,
                     })
+                    if (!response.ok) throw new Error(`HTTP ${response.status} ${response.statusText}`)
                     App.removerAnimacionReconectando()
                     return response.json()
                 } catch (error) {
+                    App.animacionReconectando()
                     console.log(error)
+                    return null
                 }
             },
 

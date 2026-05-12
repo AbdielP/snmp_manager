@@ -80,12 +80,13 @@ body{
 }
 
 .contenedor-reconectando{
-    /* background-color: rebeccapurple; */
     display: none;
     position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    inset: 0;
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    background: rgba(24, 29, 39, 0.86);
 }.contenedor-loading,.contenedor-loading-reconectando{
     display: flex;
     flex-direction: column;

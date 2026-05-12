@@ -1,5 +1,36 @@
 # PORTAL DE MONITOREO SNMP
 
+## Nota de despliegue actual
+
+Esta version del frontend quedo ajustada para correr en el servidor `cwp-vidc-scat`, servida por Apache bajo:
+
+```text
+http://cwp-vidc-scat.cwpanama.com/snmp_manager/
+```
+
+El frontend ya no apunta directamente a `http://localhost:3000`. Las llamadas al backend usan rutas relativas bajo `/api`:
+
+```javascript
+baseUrl: "/api"
+```
+
+Apache debe tener configurado el proxy correspondiente:
+
+```text
+/api/... -> http://localhost:3000/...
+```
+
+Por eso, si este frontend se mueve a otro servidor o se abre sin Apache, hay que replicar el proxy `/api` o cambiar las URLs del frontend para apuntar al backend correcto.
+
+Tambien se agrego versionado simple en `index.html` para evitar cache del navegador al desplegar cambios:
+
+```html
+main_V01.css?v=20260511-2
+main_temps.js?v=20260511-2
+```
+
+El backend dockerizado queda documentado en `../snmp_server/README.md`.
+
 ### Features
 
 - Frontend para monitoreo SNMP desarrollado en Javascript nativo.
