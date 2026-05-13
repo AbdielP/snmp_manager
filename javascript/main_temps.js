@@ -253,12 +253,20 @@
             for (let c of App.htmlElements.contenedorLoading) c.style.display = "none"
         },
         animacionReconectando: function () {
-            App.htmlElements.contenedor_reconnect.style.display = "block"
-            App.htmlElements.contenedor.style.opacity = 0.1
+            if (App.htmlElements.contenedor_reconnect) {
+                App.htmlElements.contenedor_reconnect.style.display = "flex"
+            }
+            if (App.htmlElements.contenedor) {
+                App.htmlElements.contenedor.style.opacity = 0.1
+            }
         },
         removerAnimacionReconectando: function () {
-            App.htmlElements.contenedor_reconnect.style.display = "none"
-            App.htmlElements.contenedor.style.opacity = 1
+            if (App.htmlElements.contenedor_reconnect) {
+                App.htmlElements.contenedor_reconnect.style.display = "none"
+            }
+            if (App.htmlElements.contenedor) {
+                App.htmlElements.contenedor.style.opacity = 1
+            }
         },
 
         showNoServer: function () {
@@ -335,10 +343,13 @@
                         method,
                         body: body ? JSON.stringify(body) : null,
                     })
+                    if (!response.ok) throw new Error(`HTTP ${response.status} ${response.statusText}`)
                     App.removerAnimacionReconectando()
                     return response.json()
                 } catch (error) {
+                    App.animacionReconectando()
                     console.log(error)
+                    return null
                 }
             },
 
