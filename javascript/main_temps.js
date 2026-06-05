@@ -138,26 +138,43 @@
                 // 1) Pedimos TODO en paralelo
                 const requests = base.obj.sensores.map((s) =>
                     App.utils
-                        .makeRequest({ url: App.config.api.getTemp(s.ip, s.modelo) })
-                        .then((r) => (r ? { ...r, planta: s.planta } : null))
-                        .catch(() => null)
+                        .makeRequest({ url: App.config.api.getTemp(s.ip, s.modelo), showReconnect: false })
+                        .then((r) => ({ config: s, response: r ? { ...r, planta: s.planta } : null }))
+                        .catch(() => ({ config: s, response: null }))
                 )
                 const responses = await Promise.all(requests)
                 if (App.variables.activeIDC !== idc) return
 
                 // 2) Expandir todos los sensores usando el domId del backend
                 const devices = responses
-                    .filter((r) => r && r.device && r.device.name)
-                    .flatMap((r) => {
+                    .flatMap(({ config, response: r }) => {
+                        const tipo =
+                            config.modelo === "SP2" || config.modelo === "SP2+"
+                                ? "AKCP"
+                                : "PDU"
+
+                        if (!r || !r.device || !r.device.name) {
+                            return [
+                                {
+                                    ip: config.ip,
+                                    domId: `${config.ip}-s1`,
+                                    modelo: config.modelo,
+                                    tipo,
+                                    planta: config.planta,
+                                    name: config.ip,
+                                    device: { name: config.ip, location: "" },
+                                    sensor: { temperature: "-", humidity: "-" },
+                                    disconnected: true,
+                                },
+                            ]
+                        }
+
                         if (Array.isArray(r.sensors) && r.sensors.length > 0) {
                             return r.sensors.map((s) => ({
                                 ip: r.ip, // IP real
-                                domId: s.domId, // ← viene del backend
+                                domId: s.domId, // viene del backend
                                 modelo: r.modelo,
-                                tipo:
-                                    r.modelo === "SP2" || r.modelo === "SP2+"
-                                        ? "AKCP"
-                                        : "PDU",
+                                tipo,
                                 planta: r.planta,
                                 name: r.device.name,
                                 device: r.device,
@@ -170,12 +187,14 @@
                         return [
                             {
                                 ip: r.ip,
-                                domId: `${r.ip}-s0`,
+                                domId: `${r.ip}-s1`,
                                 modelo: r.modelo,
+                                tipo,
                                 planta: r.planta,
                                 name: r.device.name,
                                 device: r.device,
                                 sensor: { temperature: "-", humidity: "-" },
+                                disconnected: true,
                             },
                         ]
                     })
@@ -195,6 +214,7 @@
                         modelo: d.modelo,
                         planta: d.planta,
                         name: d.name,
+                        disconnected: d.disconnected === true,
                     })
                 )
 
@@ -207,36 +227,72 @@
                         return
                     }
 
+                    const serverStatus = await App.utils.makeRequest({ url: App.config.api.readFile(archivo) })
+                    if (!serverStatus?.obj?.sensores || !Array.isArray(serverStatus.obj.sensores)) {
+                        App.animacionReconectando()
+                        return
+                    }
+
                     const list = Array.from(App.variables.devicesIndex.values())
                     const uniqueIPs = [...new Set(list.map((d) => d.ip))]
 
                     const tickReq = uniqueIPs.map((ip) => {
                         const any = list.find((d) => d.ip === ip)
                         return App.utils
-                            .makeRequest({ url: App.config.api.getTemp(ip, any.modelo) })
-                            .catch(() => null)
+                            .makeRequest({ url: App.config.api.getTemp(ip, any.modelo), showReconnect: false })
+                            .then((r) => ({ ip, response: r }))
+                            .catch(() => ({ ip, response: null }))
                     })
 
                     const tickRes = await Promise.all(tickReq)
                     if (App.variables.activeIDC !== idc) return
 
-                    tickRes
-                        .filter(Boolean)
-                        .forEach((r) => {
-                            if (!Array.isArray(r.sensors)) return
-                            r.sensors.forEach((s) => {
-                                const domId = s.domId // ← ya viene del backend
-                                const entry = App.variables.devicesIndex.get(domId)
-                                if (!entry) return
+                    tickRes.forEach(({ ip, response: r }) => {
+                        const entriesByIp = list.filter((d) => d.ip === ip)
+                        if (!r || !Array.isArray(r.sensors) || r.sensors.length === 0) {
+                            entriesByIp.forEach((entry) => {
                                 App.utils.updateCardValues({
-                                    domId,
+                                    domId: entry.domId,
                                     ip: entry.ip,
                                     name: entry.name,
-                                    temperatura: s.temperature ?? "-",
-                                    humedad: s.humidity ?? "-",
+                                    temperatura: "-",
+                                    humedad: "-",
+                                    disconnected: true,
                                 })
                             })
+                            return
+                        }
+
+                        const updatedDomIds = new Set()
+                        r.sensors.forEach((s) => {
+                            const domId = s.domId // ya viene del backend
+                            const entry = App.variables.devicesIndex.get(domId)
+                            if (!entry) return
+                            updatedDomIds.add(domId)
+                            entry.disconnected = false
+                            App.utils.updateCardValues({
+                                domId,
+                                ip: entry.ip,
+                                name: entry.name,
+                                temperatura: s.temperature ?? "-",
+                                humedad: s.humidity ?? "-",
+                                disconnected: false,
+                            })
                         })
+
+                        entriesByIp
+                            .filter((entry) => !updatedDomIds.has(entry.domId))
+                            .forEach((entry) => {
+                                App.utils.updateCardValues({
+                                    domId: entry.domId,
+                                    ip: entry.ip,
+                                    name: entry.name,
+                                    temperatura: "-",
+                                    humedad: "-",
+                                    disconnected: true,
+                                })
+                            })
+                    })
                 }, 20000)
             })()
         },
@@ -337,17 +393,17 @@
         },
 
         utils: {
-            makeRequest: async function ({ method = "get", url, body = null }) {
+            makeRequest: async function ({ method = "get", url, body = null, showReconnect = true }) {
                 try {
                     const response = await fetch(url, {
                         method,
                         body: body ? JSON.stringify(body) : null,
                     })
                     if (!response.ok) throw new Error(`HTTP ${response.status} ${response.statusText}`)
-                    App.removerAnimacionReconectando()
+                    if (showReconnect) App.removerAnimacionReconectando()
                     return response.json()
                 } catch (error) {
-                    App.animacionReconectando()
+                    if (showReconnect) App.animacionReconectando()
                     console.log(error)
                     return null
                 }
@@ -355,7 +411,7 @@
 
             renderCardsBulk: function (devicesPA, devicesPB) {
                 const buildCard = (d) => `
-        <div class="contenedor-sensor" id="${d.planta} ${d.domId}">
+        <div class="contenedor-sensor${d.disconnected ? " sensor-disconnected" : ""}" id="${d.planta} ${d.domId}">
             <div class="contenedor-titulo-sensor">
                 <h3 id="h3-${d.domId}">
                     <a class="link-titulo-sensor" href="http://${d.ip}/" target="_blank">${d.name}</a>
@@ -398,11 +454,13 @@
                         planta: d.planta,
                         temperatura: d.sensor?.temperature ?? "-",
                         humedad: d.sensor?.humidity ?? "-",
+                        disconnected: d.disconnected === true,
                     })
                 })
             },
 
-            updateCardValues: function ({ domId, ip, name, temperatura, humedad }) {
+            updateCardValues: function ({ domId, ip, name, temperatura, humedad, disconnected = false }) {
+                const card = document.querySelector(`[id$=" ${domId}"]`)
                 const iconoTemp = document.getElementById(`div-sensor-temp-icon-${domId}`)
                 const iconoHum = document.getElementById(`div-sensor-hum-icon-${domId}`)
                 const botonTemp = document.getElementById(`btn-temp-${domId}`)
@@ -413,19 +471,33 @@
 
                 if (!iconoTemp || !botonTemp) return
 
-                tituloCard.innerHTML = `<a class="link-titulo-sensor" href="http://${ip}/" target="_blank">${name}</a>`
+                const cachedDevice = App.variables.fullDeviceList.find((d) => d.domId === domId)
+                if (cachedDevice) {
+                    cachedDevice.disconnected = disconnected
+                    cachedDevice.sensor = {
+                        temperature: disconnected ? "-" : temperatura,
+                        humidity: disconnected ? "-" : humedad,
+                    }
+                }
+                const indexedDevice = App.variables.devicesIndex.get(domId)
+                if (indexedDevice) indexedDevice.disconnected = disconnected
 
-                if (temperatura !== "-" && temperatura !== undefined) {
+                if (card) card.classList.toggle("sensor-disconnected", disconnected)
+                tituloCard.innerHTML = `<a class="link-titulo-sensor${disconnected ? " warning-color" : ""}" href="http://${ip}/" target="_blank">${name || ip}</a>`
+
+                if (!disconnected && temperatura !== "-" && temperatura !== undefined) {
                     App.setColoresTemp(temperatura, iconoTemp, botonTemp)
                     textoTemp.innerHTML = `${temperatura}°F`
                 } else {
+                    App.removerClases(iconoTemp, botonTemp)
                     textoTemp.innerHTML = "-"
                 }
 
-                if (humedad !== "-" && humedad !== undefined) {
+                if (!disconnected && humedad !== "-" && humedad !== undefined) {
                     App.setColoresHum(humedad, iconoHum, botonHum)
                     textoHum.innerHTML = `${humedad}%`
                 } else {
+                    App.removerClases(iconoHum, botonHum)
                     textoHum.innerHTML = "-"
                 }
             },

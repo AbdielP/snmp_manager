@@ -134,6 +134,57 @@
     color: #FDA705;
 }
 
+.contenedor-planta .contenedor-sensor.sensor-disconnected {
+    background-color: #252c35;
+}
+
+.sensor-disconnected .contenedor-titulo-sensor {
+    background-color: #252c35;
+}
+
+.sensor-disconnected .link-titulo-sensor,
+.sensor-disconnected .link-titulo-sensor.warning-color {
+    color: #FDA705;
+    font-weight: 700;
+}
+
+.sensor-disconnected .contenedor-sensores-cuerpo {
+    opacity: .55;
+}
+
+.sensor-disconnected .contenedor-sensor-temp,
+.sensor-disconnected .contenedor-sensor-hum,
+.sensor-disconnected .div-sensor-temp-icon,
+.sensor-disconnected .div-sensor-hum-icon,
+.sensor-disconnected .div-sensor-temp-temperatura,
+.sensor-disconnected .div-sensor-hum-porcentaje {
+    background-color: #262d37;
+    border-color: #303844;
+}
+
+.sensor-disconnected .div-sensor-temp-icon img,
+.sensor-disconnected .div-sensor-hum-icon img {
+    filter: grayscale(1) brightness(.55);
+    opacity: .45;
+}
+
+.sensor-disconnected .div-sensor-temp-centro,
+.sensor-disconnected .div-sensor-hum-centro {
+    background-color: #262d37;
+}
+
+.sensor-disconnected .div-sensor-temp-centro button,
+.sensor-disconnected .div-sensor-hum-centro button {
+    background-color: #303844;
+    border: 1px solid #394352;
+    color: #6f7886;
+}
+
+.sensor-disconnected .div-sensor-temp-temperatura h2,
+.sensor-disconnected .div-sensor-hum-porcentaje h2 {
+    color: transparent;
+}
+
 @media screen and (max-width: 1444px) {
     .contenedor-planta .contenedor-sensor {
         width: 150px;
