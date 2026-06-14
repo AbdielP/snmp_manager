@@ -176,7 +176,7 @@
                                 modelo: r.modelo,
                                 tipo,
                                 planta: r.planta,
-                                name: r.device.name,
+                                name: s.name || r.device.name,
                                 device: r.device,
                                 sensor: {
                                     temperature: s.temperature ?? "-",
