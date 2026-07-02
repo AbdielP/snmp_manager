@@ -8,7 +8,17 @@ services:
         restart: always
         ports:
             - 80:80
-        volumes: 
+        volumes:
             - ./:/var/www/html
+    backend:
+        build:
+            context: ../snmp_server
+            dockerfile: dockerfile
+        container_name: snmp-backend
+        restart: always
+        ports:
+            - 3000:3000
+        env_file:
+            - ../snmp_server/.env
 volumes:
     html: {}

@@ -2,7 +2,7 @@
     const App = {
         variables: {
             sensoresFile: '',
-            servidorURL: "http://172.18.227.54:3000"
+            servidorURL: "http://172.18.5.235:3000"
             // servidorURL: 'http://localhost:3000'
         },
         htmlElements: {

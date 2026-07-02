@@ -12,7 +12,7 @@
         config: {
             api: {
                 // baseUrl: "http://localhost:3000",
-                baseUrl: "http://172.18.227.54:3000",
+                baseUrl: "http://172.18.5.235:3000",
                 readFile: function (archivo) {
                     return `${App.config.api.baseUrl}/read/${archivo}`
                 },
