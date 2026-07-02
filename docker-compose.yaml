@@ -6,19 +6,24 @@ services:
             dockerfile: dockerfile
         container_name: apache-server
         restart: always
-        ports:
-            - 80:80
-        volumes:
-            - ./:/var/www/html
     backend:
         build:
             context: ../snmp_server
             dockerfile: dockerfile
         container_name: snmp-backend
         restart: always
-        ports:
-            - 3000:3000
         env_file:
             - ../snmp_server/.env
+    nginx:
+        image: nginx:alpine
+        container_name: nginx-proxy
+        restart: always
+        ports:
+            - 80:80
+        volumes:
+            - ./nginx.conf:/etc/nginx/conf.d/default.conf
+        depends_on:
+            - php
+            - backend
 volumes:
     html: {}
