@@ -264,10 +264,15 @@
                         }
 
                         const updatedDomIds = new Set()
+                        const newSensors = []
+
                         r.sensors.forEach((s) => {
-                            const domId = s.domId // ya viene del backend
+                            const domId = s.domId
                             const entry = App.variables.devicesIndex.get(domId)
-                            if (!entry) return
+                            if (!entry) {
+                                newSensors.push(s)
+                                return
+                            }
                             updatedDomIds.add(domId)
                             entry.disconnected = false
                             App.utils.updateCardValues({
@@ -280,8 +285,53 @@
                             })
                         })
 
+                        if (newSensors.length > 0) {
+                            const refEntry = entriesByIp[0]
+                            const planta = refEntry?.planta
+                            const modelo = refEntry?.modelo
+                            const tipo = modelo === "SP2" || modelo === "SP2+" ? "AKCP" : "PDU"
+                            const contenedor = planta === "PA"
+                                ? App.htmlElements.contenedorSensorPA
+                                : App.htmlElements.contenedorSensorPB
+
+                            entriesByIp.forEach((entry) => {
+                                if (!updatedDomIds.has(entry.domId)) {
+                                    const card = document.querySelector(`[id$=" ${entry.domId}"]`)
+                                    if (card) card.remove()
+                                    App.variables.devicesIndex.delete(entry.domId)
+                                    App.variables.fullDeviceList = App.variables.fullDeviceList.filter(d => d.domId !== entry.domId)
+                                }
+                            })
+
+                            newSensors.forEach((s) => {
+                                const domId = s.domId
+                                const name = s.name || r.device?.name || ip
+                                App.variables.fullDeviceList.push({ ip, domId, modelo, tipo, planta, name, device: r.device, sensor: { temperature: s.temperature ?? "-", humidity: s.humidity ?? "-" }, disconnected: false })
+                                App.variables.devicesIndex.set(domId, { domId, ip, modelo, planta, name, disconnected: false })
+
+                                const wrapper = document.createElement('div')
+                                wrapper.innerHTML = `<div class="contenedor-sensor" id="${planta} ${domId}">
+    <div class="contenedor-titulo-sensor"><h3 id="h3-${domId}"><a class="link-titulo-sensor" href="http://${ip}/" target="_blank">${name}</a></h3></div>
+    <div class="contenedor-sensores-cuerpo" id="sensores-cuerpo-${domId}">
+        <div class="contenedor-sensor-temp">
+            <div id="div-sensor-temp-icon-${domId}" class="div-sensor-temp-icon"><img src="./assets/img/TEMP.png" width="20"></div>
+            <div class="div-sensor-temp-centro"><button id="btn-temp-${domId}">Temperatura</button></div>
+            <div class="div-sensor-temp-temperatura"><h2 id="h2-temp-${domId}">-</h2></div>
+        </div>
+        <div class="contenedor-sensor-hum">
+            <div id="div-sensor-hum-icon-${domId}" class="div-sensor-hum-icon"><img src="./assets/img/HUM.png" width="16"></div>
+            <div class="div-sensor-hum-centro"><button id="btn-hum-${domId}">Humedad</button></div>
+            <div class="div-sensor-hum-porcentaje"><h2 id="h2-hum-${domId}">-</h2></div>
+        </div>
+    </div>
+</div>`
+                                contenedor.appendChild(wrapper.firstElementChild)
+                                App.utils.updateCardValues({ domId, ip, name, temperatura: s.temperature ?? "-", humedad: s.humidity ?? "-", disconnected: false })
+                            })
+                        }
+
                         entriesByIp
-                            .filter((entry) => !updatedDomIds.has(entry.domId))
+                            .filter((entry) => !updatedDomIds.has(entry.domId) && App.variables.devicesIndex.has(entry.domId))
                             .forEach((entry) => {
                                 App.utils.updateCardValues({
                                     domId: entry.domId,
