@@ -538,17 +538,23 @@
                 if (!disconnected && temperatura !== "-" && temperatura !== undefined) {
                     App.setColoresTemp(temperatura, iconoTemp, botonTemp)
                     textoTemp.innerHTML = `${temperatura}°F`
+                    iconoTemp.closest('.contenedor-sensor-temp')?.classList.remove('nodata')
                 } else {
                     App.removerClases(iconoTemp, botonTemp)
                     textoTemp.innerHTML = "-"
+                    if (!disconnected) iconoTemp.closest('.contenedor-sensor-temp')?.classList.add('nodata')
+                    else iconoTemp.closest('.contenedor-sensor-temp')?.classList.remove('nodata')
                 }
 
                 if (!disconnected && humedad !== "-" && humedad !== undefined) {
                     App.setColoresHum(humedad, iconoHum, botonHum)
                     textoHum.innerHTML = `${humedad}%`
+                    iconoHum.closest('.contenedor-sensor-hum')?.classList.remove('nodata')
                 } else {
                     App.removerClases(iconoHum, botonHum)
                     textoHum.innerHTML = "-"
+                    if (!disconnected) iconoHum.closest('.contenedor-sensor-hum')?.classList.add('nodata')
+                    else iconoHum.closest('.contenedor-sensor-hum')?.classList.remove('nodata')
                 }
             },
             applyFiltersAndRender: function () {

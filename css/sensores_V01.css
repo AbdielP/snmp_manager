@@ -185,6 +185,48 @@
     color: transparent;
 }
 
+.contenedor-sensor-temp.nodata .div-sensor-temp-icon,
+.contenedor-sensor-temp.nodata .div-sensor-temp-temperatura {
+    background-color: #262d37;
+    border-color: #303844;
+}
+.contenedor-sensor-temp.nodata .div-sensor-temp-icon img {
+    filter: grayscale(1) brightness(.55);
+    opacity: .45;
+}
+.contenedor-sensor-temp.nodata .div-sensor-temp-centro {
+    background-color: #262d37;
+}
+.contenedor-sensor-temp.nodata .div-sensor-temp-centro button {
+    background-color: #303844;
+    border: 1px solid #394352;
+    color: #6f7886;
+}
+.contenedor-sensor-temp.nodata .div-sensor-temp-temperatura h2 {
+    color: transparent;
+}
+
+.contenedor-sensor-hum.nodata .div-sensor-hum-icon,
+.contenedor-sensor-hum.nodata .div-sensor-hum-porcentaje {
+    background-color: #262d37;
+    border-color: #303844;
+}
+.contenedor-sensor-hum.nodata .div-sensor-hum-icon img {
+    filter: grayscale(1) brightness(.55);
+    opacity: .45;
+}
+.contenedor-sensor-hum.nodata .div-sensor-hum-centro {
+    background-color: #262d37;
+}
+.contenedor-sensor-hum.nodata .div-sensor-hum-centro button {
+    background-color: #303844;
+    border: 1px solid #394352;
+    color: #6f7886;
+}
+.contenedor-sensor-hum.nodata .div-sensor-hum-porcentaje h2 {
+    color: transparent;
+}
+
 @media screen and (max-width: 1444px) {
     .contenedor-planta .contenedor-sensor {
         width: 150px;
